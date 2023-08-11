@@ -3,7 +3,7 @@
 #include "utils.h"
 
 
-#define WIDTH 640
+#define WIDTH 700
 #define HEIGHT 480
 #define WINDOW_TITLE "Open GL"
 
