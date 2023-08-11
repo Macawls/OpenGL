@@ -15,6 +15,6 @@ if not os.path.exists(ARTIFACT_PATH):
     print(f"\n{ANSIColors.RED}Build failed!{ANSIColors.ENDC}")
     exit(1)
 
-print(f"{ANSIColors.GREEN}Build complete!{ANSIColors.ENDC}{ANSIColors.GRAY}{ARTIFACT_PATH}{ANSIColors.ENDC}")
+print(f"\n{ANSIColors.GREEN}Build complete!\n{ANSIColors.ENDC}{ANSIColors.GRAY}{FILE_NAME}{ANSIColors.ENDC}")
 
 os.system(f'gh release create {commit_hash} {ARTIFACT_PATH} --title "Release {commit_hash}"')
