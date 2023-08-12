@@ -38,7 +38,7 @@ class Helpers:
 
     @staticmethod
     def link_object_files(object_files, build_dir, file_name, lib_dir, lib):
-        link_command = f"g++ {' '.join(object_files)} -o {os.path.join(build_dir, file_name)} -L {lib_dir} {lib} -mwindows"
+        link_command = f"g++ {' '.join(object_files)} -o {os.path.join(build_dir, file_name)} -L {lib_dir} -D GLEW_STATIC {lib} -mwindows"
         print(f"{ANSIColors.GRAY}{link_command}{ANSIColors.ENDC}")
         subprocess.call(link_command, shell=True)
 

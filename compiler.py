@@ -13,7 +13,7 @@ dependencies_dir = "dependencies"
 include_dir = f"{dependencies_dir}/include"
 lib_dir = f"{dependencies_dir}/lib"
 
-libs = "-lglfw3 -lopengl32 -lgdi32"
+libs = "-lglfw3 -lglew32 -lopengl32 -lgdi32"
 
 def setupParser():
     parser = argparse.ArgumentParser(description="Compile and optionally run the source")
