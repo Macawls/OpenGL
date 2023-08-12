@@ -3,15 +3,20 @@
 
 ## Windows
 
-Follow these [steps](https://code.visualstudio.com/docs/cpp/config-mingw) to setup MinGW on Windows
+### Compiling
 
-Make sure g++ is in your PATH
+1. Follow these [steps](https://code.visualstudio.com/docs/cpp/config-mingw) to setup MinGW-w64 via [MSYS2](https://www.msys2.org/) on Windows
 
-The project works on Windows 64-bit 🙂
+2. Make sure you have python installed
 
-### Building and Running
-Use `compiler.py --help` for more information
+4. Use `python compiler.py --help` for more information
 
-Use `compiler.py --build --run` to build and run the project
+3. Run `python compiler.py --build` to build the project
+
+This project works on Windows 64-bit 🙂
+
+### Running
+
+The exe is **portable**, simply double click it to run
 
 You can **download** the latest release on the [here](https://github.com/Macawls/OpenGL/releases)
