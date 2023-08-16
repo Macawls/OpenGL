@@ -14,6 +14,7 @@ include_dir = f"{dependencies_dir}/include"
 lib_dir = f"{dependencies_dir}/lib"
 
 libs = "-lglfw3 -lglew32 -lopengl32 -lgdi32"
+additional_flags = "-D GLEW_STATIC -static-libstdc++ -static-libgcc"
 
 def setupParser():
     parser = argparse.ArgumentParser(description="Compile and optionally run the source")
@@ -41,7 +42,7 @@ def main():
         object_files = Helpers.compile_source_files(source_files, build_dir, include_dir)
 
         print(f"{Colors.BLUE}\nLinking...\n{Colors.YELLOW}{libs}{Colors.ENDC}{Colors.ENDC}")
-        Helpers.link_object_files(object_files, build_dir, file_name, lib_dir, libs)
+        Helpers.link_object_files(object_files, build_dir, file_name, lib_dir, libs, additional_flags)
 
     if args.run:
         print(f"{Colors.BLUE}\nRunning...\n{Colors.GREEN}{file_name}{Colors.ENDC}{Colors.ENDC}")
