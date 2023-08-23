@@ -3,6 +3,7 @@
         "editor.defaultFormatter": "ms-python.black-formatter"
     },
     "files.associations": {
-        "sstream": "cpp"
+        "sstream": "cpp",
+        "cstdio": "cpp"
     }
 }
