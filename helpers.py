@@ -43,6 +43,12 @@ class Helpers:
         subprocess.call(link_command, shell=True)
 
     @staticmethod
+    def clean_output_files(build_dir):
+        for f in os.listdir(build_dir):
+            if f.endswith(".o"):
+                os.remove(os.path.join(build_dir, f))
+
+    @staticmethod
     def run_executable(build_dir, file_name):
         run_command = os.path.join(build_dir, file_name)
         print(f"{ANSIColors.GRAY}{run_command}{ANSIColors.ENDC}")

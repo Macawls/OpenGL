@@ -42,7 +42,9 @@ def main():
         object_files = Helpers.compile_source_files(source_files, build_dir, include_dir)
 
         print(f"{Colors.BLUE}\nLinking...\n{Colors.YELLOW}{libs}{Colors.ENDC}{Colors.ENDC}")
+        
         Helpers.link_object_files(object_files, build_dir, file_name, lib_dir, libs, additional_flags)
+        Helpers.clean_output_files(build_dir)
 
     if args.run:
         print(f"{Colors.BLUE}\nRunning...\n{Colors.GREEN}{file_name}{Colors.ENDC}{Colors.ENDC}")

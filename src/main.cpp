@@ -3,8 +3,9 @@
 
 #include <GLFW/glfw3.h>
 #include <cstdio>
-#include "utils.h"
-#include "shaderutils.h"
+
+#include "utils/shaderutils.h"
+#include "utils/utils.h"
 
 // glm
 #include <glm/glm.hpp>
