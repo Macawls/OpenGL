@@ -19,4 +19,4 @@ This project works on Windows 64-bit 🙂
 
 The exe is **portable**, simply double click it to run
 
-You can **download** the latest release on the [here](https://github.com/Macawls/OpenGL/releases)
+You can **download** the latest release on the [here](https://github.com/Macawls/OpenGL/releases/latest)
