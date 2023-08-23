@@ -21,7 +21,12 @@ class Helpers:
 
     @staticmethod
     def get_source_files(extensions: list, source_dir):
-        return [os.path.join(source_dir, f) for f in os.listdir(source_dir) if any(f.endswith(ext) for ext in extensions)]
+        source_files = []
+        for root, _, files in os.walk(source_dir):
+            for file in files:
+                if any(file.endswith(ext) for ext in extensions):
+                    source_files.append(os.path.join(root, file))
+        return source_files
 
     @staticmethod
     def compile_source_files(source_files, build_dir, include_dir):
