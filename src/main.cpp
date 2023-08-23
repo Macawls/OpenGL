@@ -5,7 +5,7 @@
 #include <cstdio>
 
 #include "utils/shaderutils.h"
-#include "utils/utils.h"
+#include "systems/window.h"
 
 // glm
 #include <glm/glm.hpp>
@@ -37,27 +37,7 @@ const GLchar *fragmentShaderSource = R"(
 
 int main(void)
 {
-    GLFWwindow *window;
-
-    if (!glfwInit())
-        return -1;
-
-    window = glfwCreateWindow(WIDTH, HEIGHT, WINDOW_TITLE, NULL, NULL);
-    if (!window)
-    {
-        printf("Failed to create GLFW window\n");
-        glfwTerminate();
-        return -1;
-    }
-
-    glfwMakeContextCurrent(window);
-
-    if (glewInit() != GLEW_OK)
-    {
-        fprintf(stderr, "Failed to initialize GLEW\n");
-        glfwTerminate();
-        return -1;
-    }
+    Window window = Window(WIDTH, HEIGHT, WINDOW_TITLE);
 
     GLuint VBO, VAO;
     glGenVertexArrays(1, &VAO);
@@ -80,13 +60,12 @@ int main(void)
     GLuint fragmentShader = compileShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
     GLuint shaderProgram = linkShaderProgram(vertexShader, fragmentShader);
 
-    double lastTime = glfwGetTime();
-    int frameCount = 0;
     float translationX = 0.0f;
     float translationY = 0.0f;
 
-    while (!glfwWindowShouldClose(window))
-    {
+    GLFWwindow* win = window.GetGLFWWindow();
+
+    auto updateFunction = [&]() {
         glClear(GL_COLOR_BUFFER_BIT);
 
         glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(translationX, translationY, 0.0f));
@@ -96,33 +75,41 @@ int main(void)
         GLuint translationMatrixLoc = glGetUniformLocation(shaderProgram, "translation");
         glUniformMatrix4fv(translationMatrixLoc, 1, GL_FALSE, glm::value_ptr(translationMatrix));
 
-        if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        glBindVertexArray(VAO);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        if (glfwGetKey(win, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        {
+            window.Close();
+        }
+
+        if (glfwGetKey(win, GLFW_KEY_F) == GLFW_PRESS)
+        {
+            window.ToggleFullscreen();
+        }
+
+        if (glfwGetKey(win, GLFW_KEY_LEFT) == GLFW_PRESS || glfwGetKey(win, GLFW_KEY_A) == GLFW_PRESS)
         {
             translationX -= 0.001f;
         }
 
-        if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        if (glfwGetKey(win, GLFW_KEY_RIGHT) == GLFW_PRESS || glfwGetKey(win, GLFW_KEY_D) == GLFW_PRESS)
         {
             translationX += 0.001f;
         }
 
-        if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        if (glfwGetKey(win, GLFW_KEY_UP) == GLFW_PRESS || glfwGetKey(win, GLFW_KEY_W) == GLFW_PRESS)
         {
             translationY += 0.001f;
         }
 
-        if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        if (glfwGetKey(win, GLFW_KEY_DOWN) == GLFW_PRESS || glfwGetKey(win, GLFW_KEY_S) == GLFW_PRESS)
         {
             translationY -= 0.001f;
         }
+    };
 
-        glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-
-        updateWindowTitle(window, frameCount, lastTime, WINDOW_TITLE);
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    }
+    window.Run(updateFunction);
 
     glfwTerminate();
     return 0;
