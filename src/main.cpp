@@ -78,16 +78,6 @@ int main(void)
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
-        if (glfwGetKey(win, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        {
-            window.Close();
-        }
-
-        if (glfwGetKey(win, GLFW_KEY_F) == GLFW_PRESS)
-        {
-            window.ToggleFullscreen();
-        }
-
         if (glfwGetKey(win, GLFW_KEY_LEFT) == GLFW_PRESS || glfwGetKey(win, GLFW_KEY_A) == GLFW_PRESS)
         {
             translationX -= 0.001f;

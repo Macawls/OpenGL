@@ -2,67 +2,93 @@
 #include <cstdio>
 #include "../utils/utils.h"
 
-Window::Window(int width, int height, const char* title) : width(width), height(height), title(title) {
-    if (!glfwInit()) {
-        // init error
+Window::Window(int width, int height, const char *title) : width(width), height(height), title(title)
+{
+    if (!glfwInit())
+    {
+        printf("Failed to initialize GLFW\n");
     }
 
-    // window hints
+    // Window hints, useful for compatibility
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
     window = glfwCreateWindow(width, height, title, nullptr, nullptr);
-    
-    if (!window) {
+
+    if (!window)
+    {
         printf("Failed to create GLFW window\n");
-        glfwTerminate();
     }
+
+    // Get buffer size info
+    glfwGetFramebufferSize(window, &bufferWidth, &bufferHeight);
 
     // window context
     glfwMakeContextCurrent(window);
 
-    if (glewInit() != GLEW_OK) {
+    // Setup standard callbacks
+    InitCallbacks();
+
+    // Set viewport
+    glViewport(0, 0, bufferWidth, bufferHeight);
+
+    // Set user pointer to this class
+    glfwSetWindowUserPointer(window, this);
+
+    // Enable VSync
+    // glfwSwapInterval(1);
+
+    if (glewInit() != GLEW_OK)
+    {
         fprintf(stderr, "Failed to initialize GLEW\n");
+        glfwTerminate();
     }
 }
 
-Window::~Window() {
+Window::~Window()
+{
     glfwTerminate();
 }
 
-void Window::Close() {
+void Window::InitCallbacks()
+{
+    // Make sure viewport is resized when window is resized
+    glfwSetFramebufferSizeCallback(window, [](GLFWwindow *window, int width, int height)
+                                   { glViewport(0, 0, width, height); });
+
+    // Standard controls
+    glfwSetKeyCallback(window, [](GLFWwindow *window, int key, int scancode, int action, int mods)
+                       {
+        
+        Window* w = (Window*)glfwGetWindowUserPointer(window);
+        if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+            w->Close();
+        } });
+}
+
+void Window::Close()
+{
     glfwSetWindowShouldClose(window, GL_TRUE);
 }
 
-void Window::Run(std::function<void()> renderLoop) {
+void Window::Run(std::function<void()> render)
+{
     double lastTime = glfwGetTime();
     int frameCount = 0;
 
-    while (!glfwWindowShouldClose(window)) {
+    while (!glfwWindowShouldClose(window))
+    {
         glfwPollEvents();
-        
-        renderLoop();
-        
+        render();
         glfwSwapBuffers(window);
-        
         updateTitleWithFPS(window, frameCount, lastTime, title);
         frameCount++;
     }
 }
 
-void Window::ToggleFullscreen() {
-    if (isFullscreen) {
-        glfwSetWindowMonitor(window, nullptr, windowedPosX, windowedPosY, width, height, GLFW_DONT_CARE);
-        isFullscreen = false;
-    } else {
-        const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-        glfwGetWindowPos(window, &windowedPosX, &windowedPosY);
-        glfwSetWindowMonitor(window, glfwGetPrimaryMonitor(), 0, 0, mode->width, mode->height, mode->refreshRate);
-        isFullscreen = true;
-    }
-}
-
-GLFWwindow* Window::GetGLFWWindow() {
+GLFWwindow *Window::GetGLFWWindow()
+{
     return window;
 }

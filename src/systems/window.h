@@ -10,17 +10,19 @@ public:
     Window(int width, int height, const char* title);
     ~Window();
 
-    void Run(std::function<void()> renderLoop);
-
-    void Close();
-    void ToggleFullscreen();
-    
+    void Run(std::function<void()> render);
     GLFWwindow* GetGLFWWindow();
 
 private:
     int width, height;
     const char* title;
+
+    GLint bufferWidth, bufferHeight;
     GLFWwindow* window;
+
     bool isFullscreen;
     int windowedPosX, windowedPosY;
+
+    void Close();
+    void InitCallbacks();
 };
