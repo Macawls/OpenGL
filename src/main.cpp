@@ -110,7 +110,5 @@ int main(void)
     };
 
     window.Run(updateFunction);
-
-    glfwTerminate();
     return 0;
 }
