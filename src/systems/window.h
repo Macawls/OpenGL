@@ -23,6 +23,7 @@ private:
     bool isFullscreen;
     int windowedPosX, windowedPosY;
 
+    void ToggleFullscreen();
     void Close();
     void InitCallbacks();
 };
