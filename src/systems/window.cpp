@@ -47,18 +47,11 @@ Window::Window(int width, int height, const char *title) : width(width), height(
 
     if (err != GLEW_OK)
     {
-        //fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
         Logger::Log(Logger::LogPriority::Error, "Error: %s", glewGetErrorString(err));
         glfwTerminate();
     }
 
-<<<<<<< Updated upstream
-    //fprintf(stdout, "Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
-    Logger::Log(Logger::LogPriority::Info, "OpenGL version: %s", glGetString(GL_VERSION));
-=======
     Logger::Log("OpenGL version: %s", glGetString(GL_VERSION));
-    Logger::Log("Hello there");
->>>>>>> Stashed changes
 }
 
 Window::~Window()

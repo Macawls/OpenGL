@@ -1,30 +1,35 @@
-#pragma once
 #include <iostream>
 #include <mutex>
 #include <ctime>
 
-<<<<<<< Updated upstream
-=======
 /* Example usage:
     Logger::Log(Logger::LogPriority::Error, "Error: %s", glewGetErrorString(err));
     Logger::Log("OpenGL version: %s", glGetString(GL_VERSION));
     Logger::Log("Hello there");
 */
 
-
->>>>>>> Stashed changes
 class Logger {
 public:
     enum class LogPriority {
         Debug, Info, Warning, Error
     };
 
-    // minimum priority level
+    #define DEFAULT_PRIORITY LogPriority::Info
+
+    // Set minimum priority level, default is Info
     static void SetPriority(LogPriority priority) {
         get_instance().min_priority = priority;
     }
 
-    // Log a message with a specified priority
+    // Logs a message with a default priority of INFO
+    // Output format: "[HH:MM:SS] [Priority] Message"
+    template <typename... Args>
+    static void Log(const char* format, Args... args) {
+        Log(DEFAULT_PRIORITY, format, args...);
+    }
+
+    // Logs a message with a specified priority
+    // Output format: "[HH:MM:SS] [Priority] Message"
     template <typename... Args>
     static void Log(LogPriority priority, const char* format, Args... args) {
     if (priority >= get_instance().min_priority) {
@@ -37,7 +42,7 @@ public:
 }
 
 private:
-    LogPriority min_priority = LogPriority::Info;
+    LogPriority min_priority = DEFAULT_PRIORITY;
     std::mutex mutex;
 
     static constexpr const char* COLOR_RED = "\033[31m";
