@@ -61,6 +61,7 @@ int main(void)
     GLuint vertexShader = compileShader(GL_VERTEX_SHADER, vertexShaderSource);
     GLuint fragmentShader = compileShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
     GLuint shaderProgram = linkShaderProgram(vertexShader, fragmentShader);
+    glUseProgram(shaderProgram);
 
     float translationX = 0.0f;
     float translationY = 0.0f;
@@ -79,8 +80,6 @@ int main(void)
         glClear(GL_COLOR_BUFFER_BIT);
 
         glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(translationX, translationY, 0.0f));
-
-        glUseProgram(shaderProgram);
 
         GLuint translationMatrixLoc = glGetUniformLocation(shaderProgram, "translation");
         glUniformMatrix4fv(translationMatrixLoc, 1, GL_FALSE, glm::value_ptr(translationMatrix));
