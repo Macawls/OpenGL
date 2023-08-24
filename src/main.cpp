@@ -4,6 +4,7 @@
 #include <GLFW/glfw3.h>
 #include <cstdio>
 
+#include "utils/logger.h"
 #include "utils/shaderutils.h"
 #include "systems/window.h"
 
@@ -37,6 +38,7 @@ const GLchar *fragmentShaderSource = R"(
 
 int main(void)
 {
+    Logger::SetPriority(Logger::LogPriority::Debug);
     Window window = Window(WIDTH, HEIGHT, WINDOW_TITLE);
 
     GLuint VBO, VAO;
@@ -64,6 +66,14 @@ int main(void)
     float translationY = 0.0f;
 
     GLFWwindow* win = window.GetGLFWWindow();
+
+    glfwSetKeyCallback(win, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+        Window* win = (Window*)glfwGetWindowUserPointer(window);
+        if (key == GLFW_KEY_F && action == GLFW_PRESS)
+        {
+            win->ToggleFullscreen();
+        }
+    });
 
     auto updateFunction = [&]() {
         glClear(GL_COLOR_BUFFER_BIT);

@@ -5,25 +5,43 @@
 
 #include <functional> // std::function
 
-class Window {
+class Window
+{
 public:
-    Window(int width, int height, const char* title);
+    Window(int width, int height, const char *title);
     ~Window();
 
     void Run(std::function<void()> render);
-    GLFWwindow* GetGLFWWindow();
+
+    void ToggleFullscreen()
+    {
+        int maximized = glfwGetWindowAttrib(window, GLFW_MAXIMIZED);
+        if (maximized)
+        {
+            glfwRestoreWindow(window);
+            return;
+        }
+        glfwMaximizeWindow(window);
+    }
+    void Close()
+    {
+        glfwSetWindowShouldClose(window, GL_TRUE);
+    }
+
+    GLFWwindow *GetGLFWWindow()
+    {
+        return window;
+    }
 
 private:
     int width, height;
-    const char* title;
+    const char *title;
 
     GLint bufferWidth, bufferHeight;
-    GLFWwindow* window;
+    GLFWwindow *window;
 
     bool isFullscreen;
     int windowedPosX, windowedPosY;
 
-    void ToggleFullscreen();
-    void Close();
     void InitCallbacks();
 };

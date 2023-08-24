@@ -1,6 +1,7 @@
 #include "window.h"
 #include <cstdio>
 #include "../utils/utils.h"
+#include "../utils/logger.h"
 
 Window::Window(int width, int height, const char *title) : width(width), height(height), title(title)
 {
@@ -34,57 +35,35 @@ Window::Window(int width, int height, const char *title) : width(width), height(
     // Set viewport
     glViewport(0, 0, bufferWidth, bufferHeight);
 
-    // Set user pointer to this class
+    // Set user pointer to this class, so we can access it in callbacks
     glfwSetWindowUserPointer(window, this);
 
     // Enable VSync
     // glfwSwapInterval(1);
+    GLenum err = glewInit();
 
-    if (glewInit() != GLEW_OK)
+    if (err != GLEW_OK)
     {
-        fprintf(stderr, "Failed to initialize GLEW\n");
+        //fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
+        Logger::Log(Logger::LogPriority::Error, "Error: %s", glewGetErrorString(err));
         glfwTerminate();
     }
+
+    //fprintf(stdout, "Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
+    Logger::Log(Logger::LogPriority::Info, "OpenGL version: %s", glGetString(GL_VERSION));
 }
 
 Window::~Window()
 {
+    glfwDestroyWindow(window);
     glfwTerminate();
 }
 
 void Window::InitCallbacks()
 {
     // Make sure viewport is resized when window is resized
-    glfwSetFramebufferSizeCallback(window, [](GLFWwindow *window, int width, int height){ 
-            glViewport(0, 0, width, height); 
-        });
-
-    // Standard controls
-    glfwSetKeyCallback(window, [](GLFWwindow *window, int key, int scancode, int action, int mods){
-            Window* w = (Window*)glfwGetWindowUserPointer(window);
-            
-            if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-                w->Close();
-            }
-                
-            if (key == GLFW_KEY_F && action == GLFW_PRESS){
-                w->ToggleFullscreen();
-            }
-        });
-}
-
-void Window::Close()
-{
-    glfwSetWindowShouldClose(window, GL_TRUE);
-}
-
-void Window::ToggleFullscreen(){
-    int maximized = glfwGetWindowAttrib(window, GLFW_MAXIMIZED);
-    if (maximized){
-        glfwRestoreWindow(window);
-        return;
-    }
-    glfwMaximizeWindow(window);
+    glfwSetFramebufferSizeCallback(window, [](GLFWwindow *window, int width, int height)
+                                   { glViewport(0, 0, width, height); });
 }
 
 void Window::Run(std::function<void()> render)
@@ -97,12 +76,6 @@ void Window::Run(std::function<void()> render)
         glfwPollEvents();
         render();
         glfwSwapBuffers(window);
-        updateTitleWithFPS(window, frameCount, lastTime, title);
-        frameCount++;
+        updateTitleWithFPS(window, title);
     }
-}
-
-GLFWwindow *Window::GetGLFWWindow()
-{
-    return window;
 }
