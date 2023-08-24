@@ -1,10 +1,13 @@
 #include "window.h"
 #include <cstdio>
-#include "../utils/utils.h"
 #include "../utils/logger.h"
+#include "../utils/frameTimer.h"
+
 
 Window::Window(int width, int height, const char *title) : width(width), height(height), title(title)
 {
+    frameTimer = FrameTimer();
+    
     if (!glfwInit())
     {
         printf("Failed to initialize GLFW\n");
@@ -49,8 +52,13 @@ Window::Window(int width, int height, const char *title) : width(width), height(
         glfwTerminate();
     }
 
+<<<<<<< Updated upstream
     //fprintf(stdout, "Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
     Logger::Log(Logger::LogPriority::Info, "OpenGL version: %s", glGetString(GL_VERSION));
+=======
+    Logger::Log("OpenGL version: %s", glGetString(GL_VERSION));
+    Logger::Log("Hello there");
+>>>>>>> Stashed changes
 }
 
 Window::~Window()
@@ -66,16 +74,14 @@ void Window::InitCallbacks()
                                    { glViewport(0, 0, width, height); });
 }
 
-void Window::Run(std::function<void()> render)
+void Window::Run(std::function<void(float deltaTime)> render)
 {
-    double lastTime = glfwGetTime();
-    int frameCount = 0;
-
     while (!glfwWindowShouldClose(window))
     {
         glfwPollEvents();
-        render();
+        float delta = frameTimer.GetDeltaTime();
+        render(delta);
         glfwSwapBuffers(window);
-        updateTitleWithFPS(window, title);
+        frameTimer.UpdateWindowTitleWithFPS(window, title);
     }
 }

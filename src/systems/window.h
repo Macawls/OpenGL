@@ -3,6 +3,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include "../utils/frametimer.h"
+
 #include <functional> // std::function
 
 class Window
@@ -11,7 +13,7 @@ public:
     Window(int width, int height, const char *title);
     ~Window();
 
-    void Run(std::function<void()> render);
+    void Run(std::function<void(float deltaTime)> render);
 
     void ToggleFullscreen()
     {
@@ -36,6 +38,7 @@ public:
 private:
     int width, height;
     const char *title;
+    FrameTimer frameTimer;
 
     GLint bufferWidth, bufferHeight;
     GLFWwindow *window;

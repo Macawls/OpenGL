@@ -76,7 +76,7 @@ int main(void)
         }
     });
 
-    auto updateFunction = [&]() {
+    auto updateFunction = [&](float deltaTime) {
         glClear(GL_COLOR_BUFFER_BIT);
 
         glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(translationX, translationY, 0.0f));
@@ -87,24 +87,25 @@ int main(void)
         glBindVertexArray(VAO);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
+        float translationSpeed = 2.0f;
         if (glfwGetKey(win, GLFW_KEY_LEFT) == GLFW_PRESS || glfwGetKey(win, GLFW_KEY_A) == GLFW_PRESS)
         {
-            translationX -= 0.001f;
+            translationX -= translationSpeed * deltaTime;
         }
 
         if (glfwGetKey(win, GLFW_KEY_RIGHT) == GLFW_PRESS || glfwGetKey(win, GLFW_KEY_D) == GLFW_PRESS)
         {
-            translationX += 0.001f;
+            translationX += translationSpeed * deltaTime;
         }
 
         if (glfwGetKey(win, GLFW_KEY_UP) == GLFW_PRESS || glfwGetKey(win, GLFW_KEY_W) == GLFW_PRESS)
         {
-            translationY += 0.001f;
+            translationY += translationSpeed * deltaTime;
         }
 
         if (glfwGetKey(win, GLFW_KEY_DOWN) == GLFW_PRESS || glfwGetKey(win, GLFW_KEY_S) == GLFW_PRESS)
         {
-            translationY -= 0.001f;
+            translationY -= translationSpeed * deltaTime;
         }
     };
 

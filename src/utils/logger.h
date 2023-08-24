@@ -1,7 +1,18 @@
+#pragma once
 #include <iostream>
 #include <mutex>
 #include <ctime>
 
+<<<<<<< Updated upstream
+=======
+/* Example usage:
+    Logger::Log(Logger::LogPriority::Error, "Error: %s", glewGetErrorString(err));
+    Logger::Log("OpenGL version: %s", glGetString(GL_VERSION));
+    Logger::Log("Hello there");
+*/
+
+
+>>>>>>> Stashed changes
 class Logger {
 public:
     enum class LogPriority {
