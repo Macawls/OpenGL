@@ -14,7 +14,7 @@ include_dir = f"{dependencies_dir}/include"
 lib_dir = f"{dependencies_dir}/lib"
 
 libs = "-lglfw3 -lglew32 -lopengl32 -lgdi32"
-additional_flags = "-D GLEW_STATIC -static-libstdc++ -static-libgcc"
+additional_flags = "-D GLEW_STATIC -static-libstdc++ -static-libgcc -static"
 
 def setupParser():
     parser = argparse.ArgumentParser(description="Compile and optionally run the source")
