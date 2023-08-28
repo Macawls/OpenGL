@@ -11,10 +11,10 @@ class Shader
 public:
     unsigned int ID;
 
-    Shader(const char* vertPath, const char* fragPath)
+    Shader(const char* vertSource, const char* fragsSource)
     {
-        GLuint vert = CompileShader(GL_VERTEX_SHADER, vertPath);
-        GLuint frag = CompileShader(GL_FRAGMENT_SHADER, fragPath);
+        GLuint vert = CompileShader(GL_VERTEX_SHADER, vertSource);
+        GLuint frag = CompileShader(GL_FRAGMENT_SHADER, fragsSource);
         
         ID = CreateShaderProgram(2, vert, frag);
     }

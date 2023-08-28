@@ -13,9 +13,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#define RESOURCE_PATH "src/resources/"
-#define SHADER_PATH RESOURCE_PATH "shaders/"
-
 #define WIDTH 1280
 #define HEIGHT 720
 #define WINDOW_TITLE "Moving Triangle"
@@ -27,19 +24,43 @@ int main(void)
     Window window = Window(WIDTH, HEIGHT, WINDOW_TITLE);
     GLFWwindow *win = window.GetGLFWWindow();
 
-    Shader triangleShader(SHADER_PATH "shader.vert", SHADER_PATH "shader.frag");
+    const char* vertexSource = R"glsl(
+        #version 330 core
+        layout(location = 0) in vec3 vertex_position;
+        layout(location = 1) in vec3 vertex_colour;
+
+        uniform mat4 translation;
+        out vec3 colour;
+
+        void main() 
+        {
+            colour = vertex_colour;
+            gl_Position = translation * vec4(vertex_position, 1.0);
+        }
+    )glsl";
+
+    const char* fragSource = R"glsl(
+        #version 330 core
+        in vec3 colour;
+        out vec4 frag_colour;
+
+        void main() 
+        {
+            frag_colour = vec4(colour, 1.0);
+        }
+    )glsl";
+
+    Shader triangleShader(vertexSource, fragSource);
 
     float vertices[] = {
-        -0.5f, -0.5f, 0.0f, // left
-        0.5f, -0.5f, 0.0f,  // right
-        0.0f, 0.5f, 0.0f    // top
-    };
+        -0.5f, -0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f,
+        0.0f, 0.5f, 0.0f};
 
     float colours[] = {
         1.0f, 0.0f, 0.0f,
         0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 1.0f
-    };
+        0.0f, 0.0f, 1.0f};
 
     GLuint points_vbo = 0;
     glGenBuffers(1, &points_vbo);
@@ -51,7 +72,6 @@ int main(void)
     glBindBuffer(GL_ARRAY_BUFFER, colours_vbo);
     glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(float), colours, GL_STATIC_DRAW);
 
-    
     GLuint vao = 0;
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
@@ -59,18 +79,15 @@ int main(void)
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
     glBindBuffer(GL_ARRAY_BUFFER, colours_vbo);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-    
+
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
-    
-    
-    // wireframe
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     float translationX = 0.0f;
     float translationY = 0.0f;
 
-    glfwSetKeyCallback(win, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+    glfwSetKeyCallback(win, [](GLFWwindow *window, int key, int scancode, int action, int mods)
+                       {
         Window* win = (Window*)glfwGetWindowUserPointer(window);
         if (key == GLFW_KEY_F && action == GLFW_PRESS)
         {
@@ -79,8 +96,7 @@ int main(void)
         if (key == GLFW_KEY_P && action == GLFW_PRESS)
         {
             win->CycleRenderMode();
-        }
-    });
+        } });
 
     auto renderFunction = [&](float deltaTime)
     {

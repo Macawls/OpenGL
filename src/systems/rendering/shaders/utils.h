@@ -54,9 +54,7 @@ static GLchar* ReadShaderSource(const char* path) {
 }
 
 /* Compile a shader from source code and return the shader's ID. */
-static GLuint CompileShader(GLenum shaderType, const char* path) {
-    GLchar* source = ReadShaderSource(path);
-
+static GLuint CompileShader(GLenum shaderType, const char* source) {
     GLuint shader = glCreateShader(shaderType);
     glShaderSource(shader, 1, &source, NULL);
     glCompileShader(shader);
@@ -73,7 +71,7 @@ static GLuint CompileShader(GLenum shaderType, const char* path) {
         return 0;
     }
     
-    Logger::LogDebug("%s shader compiled successfully (%s)", ShaderTypeToString(shaderType), path);
+    Logger::LogDebug("%s shader compiled successfully", ShaderTypeToString(shaderType));
     return shader;
 }
 
@@ -114,4 +112,3 @@ static GLuint CreateShaderProgram(GLuint count, ...) {
 
     return program;
 }
-
