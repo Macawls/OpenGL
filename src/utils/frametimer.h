@@ -3,21 +3,26 @@
 #include <stdio.h>
 #include <GLFW/glfw3.h>
 
-class FrameTimer {
+class FrameTimer
+{
 public:
-    FrameTimer() {
+    FrameTimer()
+    {
         titleBuffer = new char[256];
     }
 
-    ~FrameTimer() {
+    ~FrameTimer()
+    {
         delete[] titleBuffer;
     }
 
-    void UpdateWindowTitleWithFPS(GLFWwindow* window, const char* customTitle, const double updateDelta = 1.0f) {
+    void UpdateWindowTitleWithFPS(GLFWwindow *window, const char *customTitle, const double updateDelta = 1.0f)
+    {
         double currentTime = glfwGetTime();
         frameCount++;
 
-        if (currentTime - lastTime >= updateDelta) {
+        if (currentTime - lastTime >= updateDelta)
+        {
             fps = static_cast<double>(frameCount) / (currentTime - lastTime);
             snprintf(titleBuffer, 256, "%s - %.2f FPS", customTitle, fps);
             glfwSetWindowTitle(window, titleBuffer);
@@ -26,14 +31,16 @@ public:
         }
     }
 
-    double GetDeltaTime() {
+    double GetDeltaTime()
+    {
         double currentFrameTime = glfwGetTime();
         double deltaTime = currentFrameTime - lastFrameTime;
         lastFrameTime = currentFrameTime;
         return deltaTime;
     }
 
-    double GetFPS() const {
+    double GetFPS() const
+    {
         return fps;
     }
 
@@ -43,5 +50,5 @@ private:
     int frameCount;
     double fps;
 
-    char* titleBuffer;
+    char *titleBuffer;
 };

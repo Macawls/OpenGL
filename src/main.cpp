@@ -1,72 +1,74 @@
-#define GLEW_STATIC // BEFORE including glew.h!
-#include <GL/glew.h>
-
+#define GLEW_STATIC  // BEFORE including glew.h!
+#include <GL/glew.h> // always put glew.h before glfw3.h
 #include <GLFW/glfw3.h>
 #include <cstdio>
 
+// local
 #include "utils/logger.h"
-#include "utils/shaderutils.h"
 #include "systems/window.h"
+#include "systems/rendering/shaders/shader.h"
 
 // glm
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#define RESOURCE_PATH "src/resources/"
+#define SHADER_PATH RESOURCE_PATH "shaders/"
+
 #define WIDTH 1280
 #define HEIGHT 720
 #define WINDOW_TITLE "Moving Triangle"
 
-const GLchar *vertexShaderSource = R"(
-    #version 330 core
-    layout (location = 0) in vec3 position;
-    uniform mat4 translation;  // Add this line
-    void main()
-    {
-        gl_Position = translation * vec4(position, 1.0);
-    }
-)";
-
-const GLchar *fragmentShaderSource = R"(
-    #version 330 core
-    out vec4 color;
-    void main()
-    {
-        color = vec4(0.0, 0.0, 1.0, 1.0); // Blue color
-    }
-)";
-
 int main(void)
 {
     Logger::SetPriority(Logger::LogPriority::Debug);
+
     Window window = Window(WIDTH, HEIGHT, WINDOW_TITLE);
+    GLFWwindow *win = window.GetGLFWWindow();
 
-    GLuint VBO, VAO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
+    Shader triangleShader(SHADER_PATH "shader.vert", SHADER_PATH "shader.frag");
 
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    float vertices[] = {
+        -0.5f, -0.5f, 0.0f, // left
+        0.5f, -0.5f, 0.0f,  // right
+        0.0f, 0.5f, 0.0f    // top
+    };
 
-    GLfloat vertices[] = {
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        0.0f, 0.5f, 0.0f};
+    float colours[] = {
+        1.0f, 0.0f, 0.0f,
+        0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 1.0f
+    };
 
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid *)0);
+    GLuint points_vbo = 0;
+    glGenBuffers(1, &points_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
+    glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(float), vertices, GL_STATIC_DRAW);
+
+    GLuint colours_vbo = 0;
+    glGenBuffers(1, &colours_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, colours_vbo);
+    glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(float), colours, GL_STATIC_DRAW);
+
+    
+    GLuint vao = 0;
+    glGenVertexArrays(1, &vao);
+    glBindVertexArray(vao);
+    glBindBuffer(GL_ARRAY_BUFFER, points_vbo);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+    glBindBuffer(GL_ARRAY_BUFFER, colours_vbo);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+    
     glEnableVertexAttribArray(0);
-    glBindVertexArray(0);
-
-    GLuint vertexShader = compileShader(GL_VERTEX_SHADER, vertexShaderSource);
-    GLuint fragmentShader = compileShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
-    GLuint shaderProgram = linkShaderProgram(vertexShader, fragmentShader);
-    glUseProgram(shaderProgram);
+    glEnableVertexAttribArray(1);
+    
+    
+    // wireframe
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     float translationX = 0.0f;
     float translationY = 0.0f;
-
-    GLFWwindow* win = window.GetGLFWWindow();
 
     glfwSetKeyCallback(win, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
         Window* win = (Window*)glfwGetWindowUserPointer(window);
@@ -74,17 +76,21 @@ int main(void)
         {
             win->ToggleFullscreen();
         }
+        if (key == GLFW_KEY_P && action == GLFW_PRESS)
+        {
+            win->CycleRenderMode();
+        }
     });
 
-    auto updateFunction = [&](float deltaTime) {
-        glClear(GL_COLOR_BUFFER_BIT);
+    auto renderFunction = [&](float deltaTime)
+    {
+        glClearColor(0.18f, 0.18f, 0.18f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(translationX, translationY, 0.0f));
+        triangleShader.Use().SetMat4("translation", translationMatrix);
 
-        GLuint translationMatrixLoc = glGetUniformLocation(shaderProgram, "translation");
-        glUniformMatrix4fv(translationMatrixLoc, 1, GL_FALSE, glm::value_ptr(translationMatrix));
-
-        glBindVertexArray(VAO);
+        glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
         float translationSpeed = 2.0f;
@@ -109,6 +115,6 @@ int main(void)
         }
     };
 
-    window.Run(updateFunction);
+    window.Run(renderFunction);
     return 0;
 }

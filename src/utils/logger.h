@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <mutex>
 #include <ctime>
@@ -26,6 +28,21 @@ public:
     template <typename... Args>
     static void Log(const char* format, Args... args) {
         Log(DEFAULT_PRIORITY, format, args...);
+    }
+
+    template <typename... Args>
+    static void LogError(const char* format, Args... args) {
+        Log(LogPriority::Error, format, args...);
+    }
+
+    template <typename... Args>
+    static void LogWarning(const char* format, Args... args) {
+        Log(LogPriority::Warning, format, args...);
+    }
+
+    template <typename... Args>
+    static void LogDebug(const char* format, Args... args) {
+        Log(LogPriority::Debug, format, args...);
     }
 
     // Logs a message with a specified priority
