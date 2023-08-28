@@ -1,11 +1,13 @@
 #pragma once
+
 #define GLEW_STATIC // BEFORE including glew.h!
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
 #include "../utils/frametimer.h"
+#include "../utils/logger.h"
 
-#include <functional> // std::function
+#include <functional>
 
 class Window
 {
@@ -18,6 +20,7 @@ public:
     void ToggleFullscreen()
     {
         int maximized = glfwGetWindowAttrib(window, GLFW_MAXIMIZED);
+        Logger::LogDebug("Fullscreen: %s", maximized == 0 ? "true" : "false");
         if (maximized)
         {
             glfwRestoreWindow(window);
@@ -25,12 +28,31 @@ public:
         }
         glfwMaximizeWindow(window);
     }
+
     void Close()
     {
         glfwSetWindowShouldClose(window, GL_TRUE);
     }
 
-    GLFWwindow *GetGLFWWindow()
+    // Cycle between wireframe and filled mode
+    void CycleRenderMode()
+    {
+        GLint polygonMode[2];
+        glGetIntegerv(GL_POLYGON_MODE, polygonMode);
+        
+        if (polygonMode[0] == GL_FILL)
+        {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        }
+        else
+        {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
+
+        Logger::LogDebug("Polygon mode: %s", polygonMode[0] == GL_FILL ? "GL_FILL" : "GL_LINE");
+    }
+
+    GLFWwindow *GetGLFWWindow() const
     {
         return window;
     }
@@ -43,8 +65,5 @@ private:
     GLint bufferWidth, bufferHeight;
     GLFWwindow *window;
 
-    bool isFullscreen;
     int windowedPosX, windowedPosY;
-
-    void InitCallbacks();
 };

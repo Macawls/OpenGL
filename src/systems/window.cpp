@@ -10,30 +10,41 @@ Window::Window(int width, int height, const char *title) : width(width), height(
     
     if (!glfwInit())
     {
-        printf("Failed to initialize GLFW\n");
+        Logger::Log(Logger::LogPriority::Error, "Failed to initialize GLFW");
     }
+    Logger::Log("Initialized GLFW");
 
     // Window hints
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    
     glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    
+    // MSAA
+    glfwWindowHint(GLFW_SAMPLES, 4);
+    glEnable(GL_MULTISAMPLE);
 
     window = glfwCreateWindow(width, height, title, nullptr, nullptr);
 
     if (!window)
     {
-        printf("Failed to create GLFW window\n");
+        Logger::Log(Logger::LogPriority::Error, "Failed to create GLFW window");
     }
+    Logger::Log("Created GLFW window");
 
-    // Get buffer size info
+    // Get buffer size information
     glfwGetFramebufferSize(window, &bufferWidth, &bufferHeight);
 
-    // window context
+    // Set opengl context, before glew init
     glfwMakeContextCurrent(window);
 
-    // Setup standard callbacks
-    InitCallbacks();
+    // Make sure viewport updates when window is resized
+    glfwSetFramebufferSizeCallback(window, [](GLFWwindow *window, int width, int height)
+    { 
+        glViewport(0, 0, width, height); 
+    });
 
     // Set viewport
     glViewport(0, 0, bufferWidth, bufferHeight);
@@ -42,13 +53,15 @@ Window::Window(int width, int height, const char *title) : width(width), height(
     glfwSetWindowUserPointer(window, this);
 
     // Enable VSync
-    // glfwSwapInterval(1);
+    //glfwSwapInterval(1);
+    
     GLenum err = glewInit();
-
+    
     if (err != GLEW_OK)
     {
-        Logger::Log(Logger::LogPriority::Error, "Error: %s", glewGetErrorString(err));
+        Logger::LogError("GLEW Init Failed, Error: %s", glewGetErrorString(err));
         glfwTerminate();
+        return;
     }
 
     Logger::Log("OpenGL version: %s", glGetString(GL_VERSION));
@@ -60,21 +73,14 @@ Window::~Window()
     glfwTerminate();
 }
 
-void Window::InitCallbacks()
-{
-    // Make sure viewport is resized when window is resized
-    glfwSetFramebufferSizeCallback(window, [](GLFWwindow *window, int width, int height)
-                                   { glViewport(0, 0, width, height); });
-}
-
 void Window::Run(std::function<void(float deltaTime)> render)
 {
     while (!glfwWindowShouldClose(window))
     {
         glfwPollEvents();
-        float delta = frameTimer.GetDeltaTime();
-        render(delta);
+        render(frameTimer.GetDeltaTime());
         glfwSwapBuffers(window);
+        
         frameTimer.UpdateWindowTitleWithFPS(window, title);
     }
 }
