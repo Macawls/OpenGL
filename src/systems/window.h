@@ -4,7 +4,6 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "../utils/frametimer.h"
 #include "../utils/logger.h"
 
 #include <functional>
@@ -15,7 +14,20 @@ public:
     Window(int width, int height, const char *title);
     ~Window();
 
-    void Run(std::function<void(float deltaTime)> render);
+    void BeginLoop();
+
+    bool fullscreen = false;
+    bool useLines = false;
+
+    void SetPrimaryUpdate(std::function<void(float deltaTime)> func)
+    {
+        this->primary = func;
+    }
+
+    void SetSecondaryUpdate(std::function<void()> func)
+    {
+        this->secondary = func;
+    }
 
     void ToggleFullscreen()
     {
@@ -24,9 +36,11 @@ public:
         if (maximized)
         {
             glfwRestoreWindow(window);
+            fullscreen = false;
             return;
         }
         glfwMaximizeWindow(window);
+        fullscreen = true;
     }
 
     void Close()
@@ -37,19 +51,21 @@ public:
     // Cycle between wireframe and filled mode
     void CycleRenderMode()
     {
-        GLint polygonMode[2];
-        glGetIntegerv(GL_POLYGON_MODE, polygonMode);
+        GLint mode[2];
+        glGetIntegerv(GL_POLYGON_MODE, mode);
         
-        if (polygonMode[0] == GL_FILL)
+        if (mode[0] == GL_FILL)
         {
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            useLines = true;
         }
         else
         {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            useLines = false;
         }
 
-        Logger::LogDebug("Polygon mode: %s", polygonMode[0] == GL_FILL ? "GL_FILL" : "GL_LINE");
+        Logger::LogDebug("Polygon mode: %s", mode[0] == GL_FILL ? "GL_FILL" : "GL_LINE");
     }
 
     GLFWwindow *GetGLFWWindow() const
@@ -60,7 +76,9 @@ public:
 private:
     int width, height;
     const char *title;
-    FrameTimer frameTimer;
+
+    std::function<void(float deltaTime)> primary;
+    std::function<void()> secondary;
 
     GLint bufferWidth, bufferHeight;
     GLFWwindow *window;

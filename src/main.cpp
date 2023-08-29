@@ -13,8 +13,12 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#define WIDTH 1280
-#define HEIGHT 720
+// imgui
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
+
+#define WIDTH 1600
+#define HEIGHT 900
 #define WINDOW_TITLE "Moving Triangle"
 
 int main(void)
@@ -22,7 +26,7 @@ int main(void)
     Logger::SetPriority(Logger::LogPriority::Debug);
 
     Window window = Window(WIDTH, HEIGHT, WINDOW_TITLE);
-    GLFWwindow *win = window.GetGLFWWindow();
+   
 
     const char* vertexSource = R"glsl(
         #version 330 core
@@ -83,11 +87,8 @@ int main(void)
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
 
-    float translationX = 0.0f;
-    float translationY = 0.0f;
-
-    glfwSetKeyCallback(win, [](GLFWwindow *window, int key, int scancode, int action, int mods)
-                       {
+    glfwSetKeyCallback(window.GetGLFWWindow(), [](GLFWwindow *window, int key, int scancode, int action, int mods)
+    {
         Window* win = (Window*)glfwGetWindowUserPointer(window);
         if (key == GLFW_KEY_F && action == GLFW_PRESS)
         {
@@ -96,20 +97,28 @@ int main(void)
         if (key == GLFW_KEY_P && action == GLFW_PRESS)
         {
             win->CycleRenderMode();
-        } });
+        }
+    });
 
-    auto renderFunction = [&](float deltaTime)
+    // Variables
+    float translationX = 0.0f;
+    float translationY = 0.0f;
+    ImVec4 clearColour = ImVec4(0.18f, 0.18f, 0.18f, 1.0f);
+    GLFWwindow *win = window.GetGLFWWindow();
+    
+    auto game = [&](float deltaTime)
     {
-        glClearColor(0.18f, 0.18f, 0.18f, 1.0f);
+        glClearColor(clearColour.x, clearColour.y, clearColour.z, clearColour.w);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(translationX, translationY, 0.0f));
-        triangleShader.Use().SetMat4("translation", translationMatrix);
+        glm::mat4 matrix = glm::translate(glm::mat4(1.0f), glm::vec3(translationX, translationY, 0.0f));
+        triangleShader.Use().SetMat4("translation", matrix);
 
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
         float translationSpeed = 2.0f;
+
         if (glfwGetKey(win, GLFW_KEY_LEFT) == GLFW_PRESS || glfwGetKey(win, GLFW_KEY_A) == GLFW_PRESS)
         {
             translationX -= translationSpeed * deltaTime;
@@ -129,8 +138,66 @@ int main(void)
         {
             translationY -= translationSpeed * deltaTime;
         }
+        
     };
 
-    window.Run(renderFunction);
+    ImVec2 space = ImVec2(0, 10);
+    const unsigned char* renderer = glGetString(GL_RENDERER);
+    auto ui = [&]()
+    {
+        ImGui::SetNextWindowPos(ImVec2(20, 20));
+        ImGui::Begin("Config", nullptr, ImGuiWindowFlags_NoMove);
+
+        if (ImGui::BeginTabBar("Tabs"))
+        {
+            if (ImGui::BeginTabItem("Debug"))
+            {
+                ImGui::Text("Renderer: %s", renderer);
+                ImGui::Spacing();
+                ImGui::Text("FPS: %.2f", ImGui::GetIO().Framerate);
+                ImGui::Spacing();
+                ImGui::Text("Frame Time: %.4f ms", ImGui::GetIO().DeltaTime * 1000.0f);
+                ImGui::Dummy(space);
+
+                ImGui::Text("Translation");
+                ImGui::Spacing();
+                ImGui::SliderFloat("X", &translationX, -0.5f, 0.5f);
+                ImGui::SliderFloat("Y", &translationY, -0.5f, 0.5f);
+                ImGui::Dummy(space);
+
+                ImGui::Text("Rendering");
+                ImGui::Spacing();
+                if (ImGui::Checkbox("Use Lines", &window.useLines))
+                {
+                    window.CycleRenderMode();
+                }
+
+                ImGui::Dummy(space);
+                ImGui::ColorPicker4("background color", (float*)&clearColour);
+                ImGui::EndTabItem();
+            }
+
+            if (ImGui::BeginTabItem("Controls"))
+            {
+                ImGui::Text("WASD or Arrow Keys to move the triangle");
+                ImGui::Spacing();
+                ImGui::Text("F to toggle fullscreen");
+                ImGui::Spacing();
+                ImGui::Text("P to toggle wireframe mode");
+                ImGui::EndTabItem();
+            }
+
+            ImGui::EndTabBar();
+        }
+
+        ImGui::End();
+    };
+
+    window.SetPrimaryUpdate(game);
+    window.SetSecondaryUpdate(ui);
+
+
+    window.BeginLoop();
+
     return 0;
 }
