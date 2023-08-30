@@ -26,9 +26,6 @@ Window::Window(int width, int height, const char *title) : width(width), height(
     glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     
-    // MSAA
-    glfwWindowHint(GLFW_SAMPLES, 2);
-    glEnable(GL_MULTISAMPLE);
 
     // Polygon smooth (antialiasing)
     glEnable(GL_POLYGON_SMOOTH);
