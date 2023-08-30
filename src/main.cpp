@@ -15,11 +15,14 @@
 
 // imgui
 #include "imgui/imgui_impl_glfw.h"
-#include "imgui/imgui_impl_opengl3.h"
 
-#define WIDTH 1600
-#define HEIGHT 900
-#define WINDOW_TITLE "Moving Triangle"
+#include <string>
+#include <cstdio>
+
+#define WIDTH 1280
+#define HEIGHT 720
+#define WINDOW_TITLE "Triangle Demo"
+
 
 int main(void)
 {
@@ -27,32 +30,13 @@ int main(void)
 
     Window window = Window(WIDTH, HEIGHT, WINDOW_TITLE);
    
+    const char* vertexSource = 
+    #include "resources/shaders/TriangleDemo/shader.vert"
+    ;
 
-    const char* vertexSource = R"glsl(
-        #version 330 core
-        layout(location = 0) in vec3 vertex_position;
-        layout(location = 1) in vec3 vertex_colour;
-
-        uniform mat4 translation;
-        out vec3 colour;
-
-        void main() 
-        {
-            colour = vertex_colour;
-            gl_Position = translation * vec4(vertex_position, 1.0);
-        }
-    )glsl";
-
-    const char* fragSource = R"glsl(
-        #version 330 core
-        in vec3 colour;
-        out vec4 frag_colour;
-
-        void main() 
-        {
-            frag_colour = vec4(colour, 1.0);
-        }
-    )glsl";
+    const char* fragSource = 
+    #include "resources/shaders/TriangleDemo/shader.frag"
+    ;
 
     Shader triangleShader(vertexSource, fragSource);
 
@@ -101,8 +85,24 @@ int main(void)
     });
 
     // Variables
+    
+    // Translation
     float translationX = 0.0f;
     float translationY = 0.0f;
+    float translationXMax = 0.5f; 
+    float translationYMax = 0.5f;
+    float translationSpeed = 2.0f;
+    // Scale
+    float scaleFactor = 1.0f;
+    float scaleSpeed = 1.5f;
+    float scaleMax = 2.0f;
+    float scaleMin = 0.1f;
+
+    // Rotation
+    float rotationAngle = 0.0f;
+    float rotationSpeed = 10.0f;
+
+
     ImVec4 clearColour = ImVec4(0.18f, 0.18f, 0.18f, 1.0f);
     GLFWwindow *win = window.GetGLFWWindow();
     
@@ -111,13 +111,17 @@ int main(void)
         glClearColor(clearColour.x, clearColour.y, clearColour.z, clearColour.w);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glm::mat4 matrix = glm::translate(glm::mat4(1.0f), glm::vec3(translationX, translationY, 0.0f));
-        triangleShader.Use().SetMat4("translation", matrix);
+        glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(translationX, translationY, 0.0f));
+        glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), rotationAngle, glm::vec3(0.0f, 0.0f, 1.0f));
+        glm::mat4 scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scaleFactor, scaleFactor, 1.0f));
+        glm::mat4 modelMatrix = translationMatrix * scalingMatrix * rotationMatrix;
+        
+        triangleShader.Use().SetMat4("modelMatrix", modelMatrix);
 
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
-        float translationSpeed = 2.0f;
+
 
         if (glfwGetKey(win, GLFW_KEY_LEFT) == GLFW_PRESS || glfwGetKey(win, GLFW_KEY_A) == GLFW_PRESS)
         {
@@ -138,15 +142,42 @@ int main(void)
         {
             translationY -= translationSpeed * deltaTime;
         }
-        
+
+        if (glfwGetKey(win, GLFW_KEY_Q) == GLFW_PRESS)
+        {
+            scaleFactor -= scaleSpeed * deltaTime;
+        }
+
+        if (glfwGetKey(win, GLFW_KEY_E) == GLFW_PRESS)
+        {
+            scaleFactor += scaleSpeed * deltaTime;
+        }
+
+        if (glfwGetKey(win, GLFW_KEY_R) == GLFW_PRESS)
+        {
+            rotationAngle += rotationSpeed * deltaTime;
+        }
+
+        if (glfwGetKey(win, GLFW_KEY_T) == GLFW_PRESS)
+        {
+            rotationAngle -= rotationSpeed * deltaTime;
+        }
+
+        // Clamping
+
+        translationX = glm::clamp(translationX, -translationXMax, translationXMax);
+        translationY = glm::clamp(translationY, -translationYMax, translationYMax);
+        scaleFactor = glm::clamp(scaleFactor, scaleMin, scaleMax);
+        rotationAngle = std::fmod(rotationAngle, glm::two_pi<float>());
     };
 
     ImVec2 space = ImVec2(0, 10);
     const unsigned char* renderer = glGetString(GL_RENDERER);
+    
     auto ui = [&]()
     {
         ImGui::SetNextWindowPos(ImVec2(20, 20));
-        ImGui::Begin("Config", nullptr, ImGuiWindowFlags_NoMove);
+        ImGui::Begin("Configuration", nullptr, ImGuiWindowFlags_NoMove);
 
         if (ImGui::BeginTabBar("Tabs"))
         {
@@ -161,8 +192,18 @@ int main(void)
 
                 ImGui::Text("Translation");
                 ImGui::Spacing();
-                ImGui::SliderFloat("X", &translationX, -0.5f, 0.5f);
-                ImGui::SliderFloat("Y", &translationY, -0.5f, 0.5f);
+                ImGui::SliderFloat("X", &translationX, -translationXMax, translationXMax);
+                ImGui::SliderFloat("Y", &translationY, -translationYMax, translationYMax);
+                ImGui::Dummy(space);
+
+                ImGui::Text("Scale");
+                ImGui::Spacing();
+                ImGui::SliderFloat("Factor", &scaleFactor, scaleMin, scaleMax);
+                ImGui::Dummy(space);
+
+                ImGui::Text("Rotation");
+                ImGui::Spacing();
+                ImGui::SliderAngle("Angle", &rotationAngle);
                 ImGui::Dummy(space);
 
                 ImGui::Text("Rendering");
@@ -173,13 +214,18 @@ int main(void)
                 }
 
                 ImGui::Dummy(space);
-                ImGui::ColorPicker4("background color", (float*)&clearColour);
+                ImGui::ColorPicker4("background", (float*)&clearColour);
                 ImGui::EndTabItem();
             }
 
             if (ImGui::BeginTabItem("Controls"))
-            {
-                ImGui::Text("WASD or Arrow Keys to move the triangle");
+            {   
+                ImGui::Spacing();
+                ImGui::Text("WASD or Arrow Keys to move");
+                ImGui::Spacing();
+                ImGui::Text("Q/E to scale");
+                ImGui::Spacing();
+                ImGui::Text("R/T to rotate");
                 ImGui::Spacing();
                 ImGui::Text("F to toggle fullscreen");
                 ImGui::Spacing();
@@ -195,8 +241,6 @@ int main(void)
 
     window.SetPrimaryUpdate(game);
     window.SetSecondaryUpdate(ui);
-
-
     window.BeginLoop();
 
     return 0;
