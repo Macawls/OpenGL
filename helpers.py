@@ -29,12 +29,12 @@ class Helpers:
         return source_files
 
     @staticmethod
-    def compile_source_files(source_files, build_dir, include_dir):
+    def compile_source_files(source_files, build_dir, include_dir, additional_flags=""):
         object_files = []
 
         for file in source_files:
             object_file = os.path.join(build_dir, os.path.splitext(os.path.basename(file))[0] + ".o")
-            compile_command = f"g++ -c {file} -I {include_dir} -o {object_file}"
+            compile_command = f"g++ {additional_flags} -c {file} -I {include_dir} -o {object_file}"
             print(f"{ANSIColors.GRAY}{compile_command}{ANSIColors.ENDC}")
             subprocess.call(compile_command, shell=True)
             object_files.append(object_file)

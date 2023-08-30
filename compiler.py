@@ -1,5 +1,6 @@
 import argparse
 import os
+import time
 
 from helpers import (
     Helpers,
@@ -12,6 +13,8 @@ source_dir = "src"
 dependencies_dir = "dependencies"
 include_dir = f"{dependencies_dir}/include"
 lib_dir = f"{dependencies_dir}/lib"
+
+additional_compile_flags = ""
 
 libs = "-lglfw3 -lglew32 -lopengl32 -lgdi32"
 additional_flags = "-D GLEW_STATIC -static-libstdc++ -static-libgcc -static"
@@ -36,16 +39,19 @@ def main():
             print(f"{Colors.BLUE}Creating directory: {Colors.GRAY}{build_dir}{Colors.ENDC}{Colors.ENDC}")
             os.makedirs(build_dir)
 
+        start_time = time.time()
         print(f"{Colors.BLUE}Compiling...\n{Colors.RED}{source_dir}/{Colors.ENDC}{Colors.ENDC}")
         
         source_files = Helpers.get_source_files([".cpp", ".c"], source_dir)
-        object_files = Helpers.compile_source_files(source_files, build_dir, include_dir)
-
-        print(f"{Colors.BLUE}\nLinking...\n{Colors.YELLOW}{libs}{Colors.ENDC}{Colors.ENDC}")
+        object_files = Helpers.compile_source_files(source_files, build_dir, include_dir, additional_compile_flags)
         
+        print(f"{Colors.BLUE}\nLinking...\n{Colors.YELLOW}{libs}{Colors.ENDC}{Colors.ENDC}")
         Helpers.link_object_files(object_files, build_dir, file_name, lib_dir, libs, additional_flags)
-        Helpers.clean_output_files(build_dir)
+        end_time = time.time()
 
+        print(f"{Colors.GRAY}\nBuild completed {Colors.GRAY}in {Colors.GREEN}{end_time - start_time:.2f} seconds{Colors.ENDC}")
+        Helpers.clean_output_files(build_dir)
+        
     if args.run:
         print(f"{Colors.BLUE}\nRunning...\n{Colors.GREEN}{file_name}{Colors.ENDC}{Colors.ENDC}")
         name = file_name + ".exe"
