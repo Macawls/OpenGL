@@ -19,24 +19,23 @@
 #include <string>
 #include <cstdio>
 
-#define WIDTH 1280
-#define HEIGHT 720
+#define WIDTH 1600
+#define HEIGHT 900
 #define WINDOW_TITLE "Triangle Demo"
-
 
 int main(void)
 {
     Logger::SetPriority(Logger::LogPriority::Debug);
 
     Window window = Window(WIDTH, HEIGHT, WINDOW_TITLE);
-   
-    const char* vertexSource = 
-    #include "resources/shaders/TriangleDemo/shader.vert"
-    ;
 
-    const char* fragSource = 
-    #include "resources/shaders/TriangleDemo/shader.frag"
-    ;
+    const char *vertexSource =
+#include "resources/shaders/TriangleDemo/shader.vert"
+        ;
+
+    const char *fragSource =
+#include "resources/shaders/TriangleDemo/shader.frag"
+        ;
 
     Shader triangleShader(vertexSource, fragSource);
 
@@ -72,7 +71,7 @@ int main(void)
     glEnableVertexAttribArray(1);
 
     glfwSetKeyCallback(window.GetGLFWWindow(), [](GLFWwindow *window, int key, int scancode, int action, int mods)
-    {
+                       {
         Window* win = (Window*)glfwGetWindowUserPointer(window);
         if (key == GLFW_KEY_F && action == GLFW_PRESS)
         {
@@ -81,15 +80,14 @@ int main(void)
         if (key == GLFW_KEY_P && action == GLFW_PRESS)
         {
             win->CycleRenderMode();
-        }
-    });
+        } });
 
     // Variables
-    
+
     // Translation
     float translationX = 0.0f;
     float translationY = 0.0f;
-    float translationXMax = 0.5f; 
+    float translationXMax = 0.5f;
     float translationYMax = 0.5f;
     float translationSpeed = 2.0f;
     // Scale
@@ -102,10 +100,9 @@ int main(void)
     float rotationAngle = 0.0f;
     float rotationSpeed = 10.0f;
 
-
     ImVec4 clearColour = ImVec4(0.18f, 0.18f, 0.18f, 1.0f);
     GLFWwindow *win = window.GetGLFWWindow();
-    
+
     auto game = [&](float deltaTime)
     {
         glClearColor(clearColour.x, clearColour.y, clearColour.z, clearColour.w);
@@ -115,13 +112,11 @@ int main(void)
         glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), rotationAngle, glm::vec3(0.0f, 0.0f, 1.0f));
         glm::mat4 scalingMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scaleFactor, scaleFactor, 1.0f));
         glm::mat4 modelMatrix = translationMatrix * scalingMatrix * rotationMatrix;
-        
+
         triangleShader.Use().SetMat4("modelMatrix", modelMatrix);
 
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, 3);
-
-
 
         if (glfwGetKey(win, GLFW_KEY_LEFT) == GLFW_PRESS || glfwGetKey(win, GLFW_KEY_A) == GLFW_PRESS)
         {
@@ -172,8 +167,8 @@ int main(void)
     };
 
     ImVec2 space = ImVec2(0, 10);
-    const unsigned char* renderer = glGetString(GL_RENDERER);
-    
+    const unsigned char *renderer = glGetString(GL_RENDERER);
+
     auto ui = [&]()
     {
         ImGui::SetNextWindowPos(ImVec2(20, 20));
@@ -206,6 +201,22 @@ int main(void)
                 ImGui::SliderAngle("Angle", &rotationAngle);
                 ImGui::Dummy(space);
 
+                
+                // check if any of the values are different from the default
+                if (translationX != 0.0f || translationY != 0.0f || scaleFactor != 1.0f || rotationAngle != 0.0f)
+                {
+                    if (ImGui::Button("Reset"))
+                    {
+                        translationX = 0.0f;
+                        translationY = 0.0f;
+                        scaleFactor = 1.0f;
+                        rotationAngle = 0.0f;
+                    }
+
+                    ImGui::Dummy(space);
+                }
+                
+            
                 ImGui::Text("Rendering");
                 ImGui::Spacing();
                 if (ImGui::Checkbox("Use Lines", &window.useLines))
@@ -214,12 +225,12 @@ int main(void)
                 }
 
                 ImGui::Dummy(space);
-                ImGui::ColorPicker4("background", (float*)&clearColour);
+                ImGui::ColorPicker4("background", (float *)&clearColour);
                 ImGui::EndTabItem();
             }
 
             if (ImGui::BeginTabItem("Controls"))
-            {   
+            {
                 ImGui::Spacing();
                 ImGui::Text("WASD or Arrow Keys to move");
                 ImGui::Spacing();
@@ -230,6 +241,18 @@ int main(void)
                 ImGui::Text("F to toggle fullscreen");
                 ImGui::Spacing();
                 ImGui::Text("P to toggle wireframe mode");
+                ImGui::EndTabItem();
+            }
+
+            if (ImGui::BeginTabItem("Logs"))
+            {
+                ImGui::BeginChild("LogScrollRegion", ImVec2(0, 0), true, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+                for (const std::string &logEntry : Logger::GetHistory())
+                {
+                    ImGui::TextUnformatted(logEntry.c_str());
+                }
+                ImGui::EndChild();
+                
                 ImGui::EndTabItem();
             }
 
