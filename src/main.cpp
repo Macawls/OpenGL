@@ -1,8 +1,8 @@
 // local
 #include "utils/logger.h"
-#include "systems/window_context.h"
+#include "systems/window/window_context.h"
 
-#include "demos/triangle.h"
+#include "demos/triangle/triangle.h"
 
 #define WIDTH 1600
 #define HEIGHT 900

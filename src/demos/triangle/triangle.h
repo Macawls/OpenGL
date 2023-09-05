@@ -6,8 +6,9 @@
 #include <functional>
 
 // local
-#include "../systems/window_context.h"
-#include "../systems/rendering/shaders/shader.h"
+#include "../../systems/window/window_context.h"
+#include "../../systems/rendering/shaders/shader.h"
+
 
 class TranslationParams{
 public:
@@ -48,10 +49,10 @@ private:
     };
 
     const char *vertexSource =
-#include "../resources/shaders/TriangleDemo/shader.vert"
+#include "../../resources/shaders/TriangleDemo/shader.vert"
 ;
     const char *fragSource =
-#include "../resources/shaders/TriangleDemo/shader.frag"
+#include "../../resources/shaders/TriangleDemo/shader.frag"
 ;
 
     Shader triangleShader = Shader()

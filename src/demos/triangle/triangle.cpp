@@ -4,27 +4,25 @@
 
 #include "triangle.h"
 
-#include "../imgui/imgui.h"
+#include "../../imgui/imgui.h"
 
 TriangleDemo::TriangleDemo(WindowContext &context)
 {
     window = context.GetGLFWWindow();
-    
+
     glfwSetKeyCallback(window, [](GLFWwindow *window, int key, int scancode, int action, int mods)
-    {
+                       {
         WindowContext* win = (WindowContext*)glfwGetWindowUserPointer(window);
         
         if (key == GLFW_KEY_F && action == GLFW_PRESS) win->ToggleFullscreen();
-        if (key == GLFW_KEY_P && action == GLFW_PRESS) win->CycleRenderMode();
-    });
+        if (key == GLFW_KEY_P && action == GLFW_PRESS) win->CycleRenderMode(); });
 
- /*
-     triangleShader = Shader()
-    .SetVertexSource(vertexSource)
-    .SetFragmentSource(fragSource)
-    .Compile();
-
- */
+    /*
+        triangleShader = Shader()
+       .SetVertexSource(vertexSource)
+       .SetFragmentSource(fragSource)
+       .Compile();
+    */
 
     GLuint points_vbo = 0;
     glGenBuffers(1, &points_vbo);
@@ -106,14 +104,13 @@ TriangleDemo::TriangleDemo(WindowContext &context)
 
         translationParams.translationX = glm::clamp(translationParams.translationX, -translationParams.translationXMax, translationParams.translationXMax);
         translationParams.translationY = glm::clamp(translationParams.translationY, -translationParams.translationYMax, translationParams.translationYMax);
-        
+
         scaleParams.scaleFactor = glm::clamp(scaleParams.scaleFactor, scaleParams.scaleMin, scaleParams.scaleMax);
         rotationParams.rotationAngle = std::fmod(rotationParams.rotationAngle, glm::two_pi<float>());
     };
 
-
     ImVec2 space = ImVec2(0, 10);
-    
+
     uiUpdate = [&]()
     {
         ImGui::SetNextWindowPos(ImVec2(20, 20));
@@ -128,11 +125,14 @@ TriangleDemo::TriangleDemo(WindowContext &context)
                 ImGui::Text("FPS: %.2f", ImGui::GetIO().Framerate);
                 ImGui::Spacing();
                 ImGui::Text("Frame Time: %.4f ms", ImGui::GetIO().DeltaTime * 1000.0f);
-                ImGui::Dummy(space);
+                ImGui::EndTabItem();
+            }
 
+            if (ImGui::BeginTabItem("Settings"))
+            {
                 ImGui::Text("Translation");
                 ImGui::Spacing();
-                
+
                 ImGui::SliderFloat("X", &translationParams.translationX, -translationParams.translationXMax, translationParams.translationXMax);
                 ImGui::SliderFloat("Y", &translationParams.translationY, -translationParams.translationYMax, translationParams.translationYMax);
                 ImGui::Dummy(space);
@@ -159,11 +159,10 @@ TriangleDemo::TriangleDemo(WindowContext &context)
 
                     ImGui::Dummy(space);
                 }
-                
-            
+
                 ImGui::Text("Rendering");
                 ImGui::Spacing();
-               
+
                 if (ImGui::Checkbox("Use Lines", &context.renderConfig.useLines))
                 {
                     context.CycleRenderMode();
@@ -202,7 +201,7 @@ TriangleDemo::TriangleDemo(WindowContext &context)
                     ImGui::TextUnformatted(logEntry.c_str());
                 }
                 ImGui::EndChild();
-                
+
                 ImGui::EndTabItem();
             }
 
@@ -211,6 +210,4 @@ TriangleDemo::TriangleDemo(WindowContext &context)
 
         ImGui::End();
     };
-
-
 }
