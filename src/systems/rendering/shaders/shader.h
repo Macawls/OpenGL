@@ -1,6 +1,5 @@
 #pragma once
-
-#include "utils.h"
+#include "shader_utils.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -10,66 +9,31 @@ class Shader
 {
 public:
     unsigned int ID;
+    GLuint vert;
+    GLuint frag;
 
-    Shader(const char* vertSource, const char* fragsSource)
-    {
-        GLuint vert = CompileShader(GL_VERTEX_SHADER, vertSource);
-        GLuint frag = CompileShader(GL_FRAGMENT_SHADER, fragsSource);
-        
-        ID = CreateShaderProgram(2, vert, frag);
-    }
-   
-    Shader Use() 
-    { 
-        glUseProgram(ID);
-        return *this; 
-    }
+    Shader() {}
+    Shader(const char* vertSource, const char* fragsSource);
 
-    Shader SetBool(const std::string &name, bool value) const
-    {         
-        glUniform1i(glGetUniformLocation(ID, name.c_str()), (int)value);
-        return *this;
-    }
-   
-    Shader SetInt(const std::string &name, int value) const
-    { 
-        glUniform1i(glGetUniformLocation(ID, name.c_str()), value); 
-        return *this;
-    }
+    Shader& SetVertexSource(const char* vertSource);
+    Shader& SetFragmentSource(const char* fragsSource);
     
-    Shader SetFloat(const std::string &name, float value) const
-    { 
-        glUniform1f(glGetUniformLocation(ID, name.c_str()), value);
-        return *this; 
-    }
+    Shader& Compile();
+    
+    Shader& Use();
 
-    Shader SetVec2(const std::string &name, const glm::vec2 &value) const
-    { 
-        glUniform2fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]);
-        return *this; 
-    }
-
-    Shader SetVec3(const std::string &name, const glm::vec3 &value) const
-    { 
-        glUniform3fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]);
-        return *this; 
-    }
-
-    Shader SetVec4(const std::string &name, const glm::vec4 &value) const
-    {
-        glUniform4fv(glGetUniformLocation(ID, name.c_str()), 1, glm::value_ptr(value));
-        return *this; 
-    }
-
-    Shader SetMat3(const std::string &name, const glm::mat3 &mat) const
-    {
-        glUniformMatrix3fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, glm::value_ptr(mat));
-        return *this; 
-    }
-
-    Shader SetMat4(const std::string &name, const glm::mat4 &mat) const
-    {
-        glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, glm::value_ptr(mat));
-        return *this; 
-    }
+    // Primitive
+    Shader& SetBool(const std::string &name, bool value);
+    Shader& SetInt(const std::string &name, int value);
+    Shader& SetFloat(const std::string &name, float value);
+    
+    // Vector
+    Shader& SetVec2(const std::string &name, const glm::vec2 &value);
+    Shader& SetVec3(const std::string &name, const glm::vec3 &value);
+    Shader& SetVec4(const std::string &name, const glm::vec4 &value);
+    
+    // Matrix
+    Shader& SetMat2(const std::string &name, const glm::mat2 &mat);
+    Shader& SetMat3(const std::string &name, const glm::mat3 &mat);
+    Shader& SetMat4(const std::string &name, const glm::mat4 &mat);
 };

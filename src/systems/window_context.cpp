@@ -1,7 +1,6 @@
-#include "window.h"
+#include "window_context.h"
 #include <cstdio>
 #include "../utils/logger.h"
-
 
 #include "../imgui/imgui_impl_glfw.h"
 #include "../imgui/imgui_impl_opengl3.h"
@@ -9,7 +8,7 @@
 #include <string>
 
 
-Window::Window(int width, int height, const char *title) : width(width), height(height), title(title)
+WindowContext::WindowContext(int width, int height, const char *title) : width(width), height(height), title(title)
 {
     if (!glfwInit())
     {
@@ -26,7 +25,6 @@ Window::Window(int width, int height, const char *title) : width(width), height(
     glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     
-
     // Polygon smooth (antialiasing)
     glEnable(GL_POLYGON_SMOOTH);
     glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
@@ -57,7 +55,7 @@ Window::Window(int width, int height, const char *title) : width(width), height(
     // Set user pointer to this class, so we can access it in callbacks
     glfwSetWindowUserPointer(window, this);
 
-    // Enable VSync
+    //Enable VSync
     //glfwSwapInterval(1);
     //useVSync = true;
     
@@ -91,9 +89,10 @@ Window::Window(int width, int height, const char *title) : width(width), height(
     Logger::LogDebug("OpenGL Version: %s", glGetString(GL_VERSION));
     Logger::LogDebug("OpenGL Vendor: %s", glGetString(GL_VENDOR));
     Logger::LogDebug("OpenGL Renderer: %s", glGetString(GL_RENDERER));
+    Logger::LogDebug("WindowContext init success");
 }
 
-Window::~Window()
+WindowContext::~WindowContext()
 {
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
@@ -103,23 +102,32 @@ Window::~Window()
     glfwTerminate();
 }
 
-void Window::BeginLoop()
+// Ran before imgui calls
+void WindowContext::ImGUIBegin()
+{
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+}
+
+// Ran after imgui calls
+void WindowContext::ImGUIEnd()
+{
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+void WindowContext::BeginLoop()
 {
     while (!glfwWindowShouldClose(window))
     {
         glfwPollEvents();
 
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
-        primary(ImGui::GetIO().DeltaTime);
-        secondary();
-        
-        
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        ImGUIBegin();
+        update(ImGui::GetIO().DeltaTime);
+        ImGUIEnd();
         
         glfwSwapBuffers(window);
     }
 }
+

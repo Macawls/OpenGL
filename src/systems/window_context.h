@@ -8,25 +8,28 @@
 
 #include <functional>
 
-class Window
+struct RenderConfig
+{
+    bool fullscreen;
+    bool useLines;
+};
+
+
+class WindowContext
 {
 public:
-    Window(int width, int height, const char *title);
-    ~Window();
+    WindowContext(int width, int height, const char *title);
+    // WindowContext(ContextConfig config);
+    
+    ~WindowContext();
 
     void BeginLoop();
+    
+    RenderConfig renderConfig;
 
-    bool fullscreen = false;
-    bool useLines = false;
-
-    void SetPrimaryUpdate(std::function<void(float deltaTime)> func)
+    void SetUpdate(std::function<void(float deltaTime)> func)
     {
-        this->primary = func;
-    }
-
-    void SetSecondaryUpdate(std::function<void()> func)
-    {
-        this->secondary = func;
+        this->update = func;
     }
 
     void ToggleFullscreen()
@@ -36,11 +39,11 @@ public:
         if (maximized)
         {
             glfwRestoreWindow(window);
-            fullscreen = false;
+            renderConfig.fullscreen = false;
             return;
         }
         glfwMaximizeWindow(window);
-        fullscreen = true;
+        renderConfig.fullscreen = true;
     }
 
     void Close()
@@ -57,12 +60,12 @@ public:
         if (mode[0] == GL_FILL)
         {
             glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-            useLines = true;
+            renderConfig.useLines = true;
         }
         else
         {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            useLines = false;
+            renderConfig.useLines = false;
         }
 
         Logger::LogDebug("Polygon mode: %s", mode[0] == GL_FILL ? "GL_FILL" : "GL_LINE");
@@ -77,11 +80,11 @@ private:
     int width, height;
     const char *title;
 
-    std::function<void(float deltaTime)> primary;
-    std::function<void()> secondary;
+    std::function<void(float deltaTime)> update;
 
     GLint bufferWidth, bufferHeight;
     GLFWwindow *window;
 
-    int windowedPosX, windowedPosY;
+    void ImGUIBegin();
+    void ImGUIEnd();
 };

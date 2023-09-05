@@ -5,6 +5,7 @@
 #include <ctime>
 #include <cstdarg>
 #include <deque>
+#include <string>
 
 /* Example usage:
     Logger::Log(Logger::LogPriority::Error, "Error: %s", glewGetErrorString(err));
@@ -79,18 +80,22 @@ public:
         if (priority >= get_instance().min_priority)
         {
             std::scoped_lock lock(get_instance().mutex);
+            
             print_timestamp();
+            print_identifier();
             std::cout << get_color_code(priority) << "[" << priority_to_string(priority) << "] " << COLOR_RESET;
             printf(format, args...);
             std::cout << std::endl;
 
             add_to_history(format, args...);
+            get_instance().current_count++;
         }
     }
 
 private:
     LogPriority min_priority = DEFAULT_PRIORITY;
     size_t max_history_size = DEFAULT_MAX_HISTORY_SIZE;
+    unsigned int current_count = 0;
 
     std::mutex mutex;
     std::deque<std::string> history;
@@ -153,6 +158,12 @@ private:
         std::cout << COLOR_GRAY << "[" << time_buffer << "] " << COLOR_RESET;
     }
 
+    static void print_identifier()
+    {
+        Logger &logger = get_instance();
+        std::cout << COLOR_GRAY << logger.current_count << ": " << COLOR_RESET;
+    }
+
     static void add_to_history(const char *format, ...)
     {
         Logger &logger = get_instance();
@@ -169,7 +180,8 @@ private:
         {
             logger.history.pop_back();
         }
-        
+
+        message = "[" + std::to_string(logger.current_count) + "] " + message;
         logger.history.push_front(message);
     }
 };

@@ -8,7 +8,7 @@
 #include <stdarg.h>
 
 /* Convert shader type enum to string. */
-const char* ShaderTypeToString(GLenum shaderType) {
+static const char* ShaderTypeToString(GLenum shaderType) {
     switch (shaderType) {
         case GL_VERTEX_SHADER:
             return "Vertex";
@@ -76,6 +76,8 @@ static GLuint CompileShader(GLenum shaderType, const char* source) {
 }
 
 /* Create a shader program, attach shaders and return the program's ID. */
+/* Count is the number of shaders, args are the shader's ids. */
+/* Deletes the shaders but not the program after creation. */
 static GLuint CreateShaderProgram(GLuint count, ...) {
     GLuint program = glCreateProgram();
 
@@ -109,6 +111,7 @@ static GLuint CreateShaderProgram(GLuint count, ...) {
         glDeleteShader(shader);
     }
     va_end(shaderList);
-
+    
+    Logger::LogDebug("Shader with ID: %d compiled", program);
     return program;
 }
