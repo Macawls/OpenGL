@@ -69,6 +69,8 @@
         "deque": "cpp",
         "ranges": "cpp",
         "span": "cpp",
-        "stack": "cpp"
-    }
+        "stack": "cpp",
+        "*.vert": "cpp"
+    },
+    "cmake.configureOnOpen": false
 }
