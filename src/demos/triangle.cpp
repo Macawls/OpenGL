@@ -18,9 +18,13 @@ TriangleDemo::TriangleDemo(WindowContext &context)
         if (key == GLFW_KEY_P && action == GLFW_PRESS) win->CycleRenderMode();
     });
 
-    //triangleShader.SetVertexSource(vertexSource).SetFragmentSource(fragSource).Compile();
+ /*
+     triangleShader = Shader()
+    .SetVertexSource(vertexSource)
+    .SetFragmentSource(fragSource)
+    .Compile();
 
-    triangleShader = Shader(vertexSource, fragSource);
+ */
 
     GLuint points_vbo = 0;
     glGenBuffers(1, &points_vbo);

@@ -32,7 +32,6 @@ public:
     float rotationSpeed = 10.0f;
 };
 
-
 class TriangleDemo
 {
 private:
@@ -55,9 +54,10 @@ private:
 #include "../resources/shaders/TriangleDemo/shader.frag"
 ;
 
-    Shader triangleShader;
-
-
+    Shader triangleShader = Shader()
+                        .SetVertexSource(vertexSource)
+                        .SetFragmentSource(fragSource)
+                        .Compile();
 
     const char* renderer;
 

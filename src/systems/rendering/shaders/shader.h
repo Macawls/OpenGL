@@ -9,8 +9,8 @@ class Shader
 {
 public:
     unsigned int ID;
-    GLuint vert;
-    GLuint frag;
+    unsigned int vert;
+    unsigned int frag;
 
     Shader() {}
     Shader(const char* vertSource, const char* fragsSource);

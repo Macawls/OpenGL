@@ -11,10 +11,10 @@ Shader::Shader(const char* vertSource, const char* fragsSource)
     ID = CreateShaderProgram(2, vert, frag);
 }
 
-Shader& Shader::Compile()
-{
-    ID = CreateShaderProgram(2, vert, frag);
-    return *this;
+Shader& Shader::Use() 
+{ 
+    glUseProgram(ID);
+    return *this; 
 }
 
 Shader& Shader::SetVertexSource(const char* vertSource)
@@ -29,12 +29,10 @@ Shader& Shader::SetFragmentSource(const char* fragsSource)
     return *this;
 }
 
-
-
-Shader& Shader::Use() 
-{ 
-    glUseProgram(ID);
-    return *this; 
+Shader& Shader::Compile()
+{
+    ID = CreateShaderProgram(2, vert, frag);
+    return *this;
 }
 
 Shader& Shader::SetBool(const std::string &name, bool value)
