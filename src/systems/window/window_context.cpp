@@ -46,7 +46,9 @@ WindowContext::WindowContext(int width, int height, const char *title, float img
 
     // Make sure viewport updates when window is resized
     glfwSetFramebufferSizeCallback(window, [](GLFWwindow *window, int width, int height)
-                                   { glViewport(0, 0, width, height); });
+    { 
+        glViewport(0, 0, width, height); 
+    });
 
     // Set viewport
     glViewport(0, 0, bufferWidth, bufferHeight);
@@ -54,9 +56,15 @@ WindowContext::WindowContext(int width, int height, const char *title, float img
     // Set user pointer to this class, so we can access it in callbacks
     glfwSetWindowUserPointer(window, this);
 
-    // Enable VSync
+
+    glfwSetWindowCloseCallback(window, [](GLFWwindow *window)
+    {
+        WindowContext *win = (WindowContext *)glfwGetWindowUserPointer(window);
+        win->Close();
+    });
+
+    // VSync
     // glfwSwapInterval(1);
-    // useVSync = true;
 
     GLenum err = glewInit();
 
@@ -86,8 +94,7 @@ WindowContext::WindowContext(int width, int height, const char *title, float img
 
 WindowContext::~WindowContext()
 {
-    m_imguiModule.~ImGUIModule(); // destroy imgui context
-
+    // imgui shutdown is already called in it's destructor, no need to call it here
     glfwDestroyWindow(window);
     glfwTerminate();
 }

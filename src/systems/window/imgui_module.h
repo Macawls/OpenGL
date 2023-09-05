@@ -15,6 +15,7 @@ public:
 
     // Run after imgui calls
     void EndFrame();
+
 private:
     void UseTheme();
 };
