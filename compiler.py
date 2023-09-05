@@ -15,15 +15,16 @@ include_dir = f"{dependencies_dir}/include"
 lib_dir = f"{dependencies_dir}/lib"
 
 additional_compile_flags = ""
+additional_linker_flags = "-D GLEW_STATIC -static-libstdc++ -static-libgcc -static"
 
 libs = "-lglfw3 -lglew32 -lopengl32 -lgdi32"
-additional_flags = "-D GLEW_STATIC -static-libstdc++ -static-libgcc -static"
 
 def setupParser():
     parser = argparse.ArgumentParser(description="Compile and optionally run the source")
     parser.add_argument("--run", action="store_true", help="Run the executable")
     parser.add_argument("--clean", action="store_true", help="Clean the build directory")
     parser.add_argument("--build", action="store_true", help="Build the source")
+    parser.add_argument("--mwindows", action="store_true", help="Compile with -mwindows flag (no console)")
 
     return parser
 
@@ -43,10 +44,16 @@ def main():
         print(f"{Colors.BLUE}Compiling...\n{Colors.RED}{source_dir}/{Colors.ENDC}{Colors.ENDC}")
         
         source_files = Helpers.get_source_files([".cpp", ".c"], source_dir)
-        object_files = Helpers.compile_source_files(source_files, build_dir, include_dir, additional_compile_flags)
+        object_files = Helpers.compile_source_files(source_files, build_dir, include_dir, 
+                                                    additional_flags = additional_compile_flags)
         
         print(f"{Colors.BLUE}\nLinking...\n{Colors.YELLOW}{libs}{Colors.ENDC}{Colors.ENDC}")
-        Helpers.link_object_files(object_files, build_dir, file_name, lib_dir, libs, additional_flags)
+        
+        mwindowsStatus = " -mwindows" if args.mwindows else ""
+        
+        Helpers.link_object_files(object_files, build_dir, file_name, lib_dir, libs, 
+                                  additional_flags = additional_linker_flags + mwindowsStatus)
+        
         end_time = time.time()
 
         print(f"{Colors.GRAY}\nBuild completed {Colors.GRAY}in {Colors.GREEN}{end_time - start_time:.2f} seconds{Colors.ENDC}")
