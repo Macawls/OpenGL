@@ -9,9 +9,7 @@
 
 2. Make sure you have python installed
 
-4. Use `python compiler.py --help` for more information
-
-3. Run `python compiler.py --build` to build the project
+3. Use `python compiler.py --help` for more information
 
 This project works on Windows 64-bit 🙂
 
