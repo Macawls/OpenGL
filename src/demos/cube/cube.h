@@ -10,28 +10,11 @@
 #include "../../systems/shader/shader.h"
 #include "../../systems/camera/perspective_camera.h"
 
-class TranslationParams{
-public:
-    glm::vec3 translation = glm::vec3(0.0f, 0.0f, 0.0f);
-    float translationSpeed = 2.0f;
-};
-
-class ScaleParams{
-public:
-    float scaleFactor = 1.0f;
-    float scaleSpeed = 1.5f;
-    glm::vec2 scaleBounds = glm::vec2(0.1f, 2.0f);
-};
-
-class RotationParams{
-public:
-    float rotationAngle = 0.0f;
-    float rotationSpeed = 10.0f;
-};
-
 class CubeDemo
 {
 private:
+
+    // Cube
     float vertices[24] = {
        -0.5f, -0.5f, -0.5f,
         0.5f, -0.5f, -0.5f,
@@ -43,13 +26,13 @@ private:
        -0.5f, 0.5f, 0.5f,
     };
     
-    // (CCW)
+    
     unsigned int indices[36] = {
-        0, 1, 2, 2, 3, 0, // Front 
-        4, 5, 6, 6, 7, 4, // Back 
-        1, 5, 6, 6, 2, 1, // Right 
-        0, 4, 7, 7, 3, 0, // Left 
-        3, 2, 6, 6, 7, 3, // Top 
+        0, 1, 2, 2, 3, 0, // Front
+        4, 5, 6, 6, 7, 4, // Back
+        1, 5, 6, 6, 2, 1, // Right
+        0, 4, 7, 7, 3, 0, // Left
+        3, 2, 6, 6, 7, 3, // Top
         0, 1, 5, 5, 4, 0  // Bottom
     };
 
@@ -65,37 +48,40 @@ private:
     };
 
 
-
     PerspectiveCamera camera;
 
-    const char *vertexSource =
-#include "../../resources/shaders/CubeDemo/shader.vert"
+    const char *cubeVert =
+#include "../../resources/shaders/CubeDemo/cube_shader.vert"
 ;
-    const char *fragSource =
-#include "../../resources/shaders/CubeDemo/shader.frag"
+    const char *cubeFrag =
+#include "../../resources/shaders/CubeDemo/cube_shader.frag"
 ;
+
+
+    // Cube
+    unsigned int cubeVBO, cubeVAO, cubeEBO;
 
     Shader cubeShader = Shader()
-                        .SetVertexSource(vertexSource)
-                        .SetFragmentSource(fragSource)
+                        .SetVertexSource(cubeVert)
+                        .SetFragmentSource(cubeFrag)
                         .Compile();
-
+    // Cube Variables
     glm::vec4 cubeColor = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
     
     glm::vec3 cubeTranslation = glm::vec3(0.0f, 0.0f, 0.0f);
-    glm::vec3 cubeRotation = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 cubeRotation = glm::vec3(25.0f, 45.0f, 0.0f);
     glm::vec3 cubeScale = glm::vec3(1.0f, 1.0f, 1.0f);
 
-    unsigned int VBO, VAO, EBO;            
+    bool cullFaces = true;
+    int cullFaceMode = 0; // 0 = GL_BACK, 1 = GL_FRONT, 2 = GL_FRONT_AND_BACK
+    int frontFaceMode = 0; // 0 = GL_CCW, 1 = GL_CW
+
+    void InitCube();
 
 public:
     CubeDemo(WindowContext &context);
 
     glm::vec4 clearColour = glm::vec4(0.18f, 0.18f, 0.18f, 1.0f);
-
-    TranslationParams translationParams;
-    ScaleParams scaleParams;
-    RotationParams rotationParams;
     GLFWwindow *window;
 
     std::function<void()> uiUpdate;

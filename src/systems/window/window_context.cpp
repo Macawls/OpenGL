@@ -24,7 +24,7 @@ WindowContext::WindowContext(int width, int height, const char *title, float img
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
     // set multisampling
-    glfwWindowHint(GLFW_SAMPLES, 4);
+    // glfwWindowHint(GLFW_SAMPLES, 4);
 
     window = glfwCreateWindow(width, height, title, nullptr, nullptr);
 
@@ -43,9 +43,6 @@ WindowContext::WindowContext(int width, int height, const char *title, float img
     glEnable(GL_DEPTH_TEST);
     // Set the depth function
     glDepthFunc(GL_LESS);
-
-    // Face culling
-    glEnable(GL_CULL_FACE);
 
     // Get buffer size information
     glfwGetFramebufferSize(window, &bufferWidth, &bufferHeight);
