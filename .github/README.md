@@ -16,7 +16,15 @@ This project only works on Windows 64-bit 😎👍
 
 3. Use `python compiler.py --help` for more information
 
+Here are a few commands
 
+```txt
+--run       Run the executable after building
+--clean     Clean the build directory before building
+--build     Build the source
+--mwindows  Compile with -mwindows flag (no console)
+--release   Compiles for release
+  ```
 
 ### Running
 
@@ -25,7 +33,7 @@ The exe is **portable**, simply double click it to run
 You can **download** the latest release on the [here](https://github.com/Macawls/OpenGL/releases/latest)
 
 # Misc
-## Using a different font for IMGUI
+## Using a Custom Font for IMGUI
 
 [Relevant ImGUI Source](https://github.com/ocornut/imgui/blob/master/misc/fonts/binary_to_compressed_c.cpp)
 

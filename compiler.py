@@ -21,11 +21,11 @@ libs = "-lglfw3 -lglew32 -lopengl32 -lgdi32"
 
 def setupParser():
     parser = argparse.ArgumentParser(description="Compile and optionally run the source")
-    parser.add_argument("--run", action="store_true", help="Run the executable")
-    parser.add_argument("--clean", action="store_true", help="Clean the build directory")
+    parser.add_argument("--run", action="store_true", help="Run the executable after building")
+    parser.add_argument("--clean", action="store_true", help="Clean the build directory before building")
     parser.add_argument("--build", action="store_true", help="Build the source")
-    parser.add_argument("--mwindows", action="store_true", help="Compile with -mwindows flag (no console)")
-    parser.add_argument("--release", action="store_true", help="Compiles for release")
+    parser.add_argument("--mwindows", action="store_true", help="Build with -mwindows flag (no console)")
+    parser.add_argument("--release", action="store_true", help="Builds for release")
 
     return parser
 
