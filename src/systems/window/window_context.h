@@ -9,7 +9,7 @@
 
 #include <functional>
 
-#define DEFAULT_FONT_SIZE 20.0f
+#define DEFAULT_FONT_SIZE 22.0f
 
 struct RenderConfig
 {
@@ -17,7 +17,7 @@ struct RenderConfig
     bool useLines;
 };
 
-
+// A Wrapper for GLFWwindow, also manages ImGui and OpenGL context
 class WindowContext
 {
 public:
@@ -36,10 +36,17 @@ public:
     void CycleRenderMode();
     void ToggleFullscreen();
     void Close();
+    
+    GLFWvidmode GetVideoMode() 
+    { 
+        const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+        return *mode;
+    }
 
-private:
     GLint bufferWidth;
     GLint bufferHeight;
+
+private:
     GLFWwindow *window;
     
     std::function<void(float deltaTime)> update;

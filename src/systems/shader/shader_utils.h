@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../utils/logger.h"
+#include "../../utils/logger.h"
 #include <GL/glew.h>
 
 #include <stdio.h>

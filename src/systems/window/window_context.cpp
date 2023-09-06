@@ -15,7 +15,7 @@ WindowContext::WindowContext(int width, int height, const char *title, float img
 
     Logger::LogDebug("Initialized GLFW");
 
-    // Window hints
+    // Window hints, before window creation
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -23,12 +23,8 @@ WindowContext::WindowContext(int width, int height, const char *title, float img
     glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
-    // Polygon smooth (antialiasing)
-    glEnable(GL_POLYGON_SMOOTH);
-    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
-
-    // Depth testing
-    glEnable(GL_DEPTH_TEST);
+    // set multisampling
+    glfwWindowHint(GLFW_SAMPLES, 4);
 
     window = glfwCreateWindow(width, height, title, nullptr, nullptr);
 
@@ -38,30 +34,48 @@ WindowContext::WindowContext(int width, int height, const char *title, float img
     }
     Logger::LogDebug("Created GLFW window");
 
+
+    // Polygon smooth (antialiasing)
+    glEnable(GL_POLYGON_SMOOTH);
+    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+
+    // Depth testing
+    glEnable(GL_DEPTH_TEST);
+    // Set the depth function
+    glDepthFunc(GL_LESS);
+
+    // Face culling
+    glEnable(GL_CULL_FACE);
+
     // Get buffer size information
     glfwGetFramebufferSize(window, &bufferWidth, &bufferHeight);
 
     // Set opengl context, before glew and imgui init
     glfwMakeContextCurrent(window);
 
-    // Make sure viewport updates when window is resized
-    glfwSetFramebufferSizeCallback(window, [](GLFWwindow *window, int width, int height)
-    { 
-        glViewport(0, 0, width, height); 
-    });
-
-    // Set viewport
-    glViewport(0, 0, bufferWidth, bufferHeight);
-
     // Set user pointer to this class, so we can access it in callbacks
     glfwSetWindowUserPointer(window, this);
 
+    // Make sure viewport updates when window is resized
+    glfwSetFramebufferSizeCallback(window, [](GLFWwindow *window, int width, int height)
+    {
+        WindowContext *win = (WindowContext *)glfwGetWindowUserPointer(window);
+        
+        win->bufferWidth = width;
+        win->bufferHeight = height;
+        
+        glViewport(0, 0, width, height); 
+    });
 
     glfwSetWindowCloseCallback(window, [](GLFWwindow *window)
     {
         WindowContext *win = (WindowContext *)glfwGetWindowUserPointer(window);
         win->Close();
     });
+
+    // Set viewport
+    glViewport(0, 0, bufferWidth, bufferHeight);
+
 
     // VSync
     // glfwSwapInterval(1);

@@ -7,7 +7,7 @@
 
 // local
 #include "../../systems/window/window_context.h"
-#include "../../systems/rendering/shaders/shader.h"
+#include "../../systems/shader/shader.h"
 
 
 class TranslationParams{
