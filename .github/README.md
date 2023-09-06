@@ -22,8 +22,8 @@ Here are a few commands
 --run       Run the executable after building
 --clean     Clean the build directory before building
 --build     Build the source
---mwindows  Compile with -mwindows flag (no console)
---release   Compiles for release
+--mwindows  Build with -mwindows flag (no console)
+--release   Builds for release
   ```
 
 ### Running
