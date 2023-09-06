@@ -9,7 +9,7 @@ ARTIFACT_PATH = f"{BUILD_FOLDER}/{FILE_NAME}"
 # Short commit hash
 commit_hash = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"]).strip().decode("utf-8")
 
-subprocess.call("python compiler.py --build --mwindows")
+subprocess.call("python compiler.py --build --release --mwindows")
 
 if not os.path.exists(ARTIFACT_PATH):
     print(f"\n{ANSIColors.RED}Build failed!{ANSIColors.ENDC}")

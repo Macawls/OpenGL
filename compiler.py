@@ -25,6 +25,7 @@ def setupParser():
     parser.add_argument("--clean", action="store_true", help="Clean the build directory")
     parser.add_argument("--build", action="store_true", help="Build the source")
     parser.add_argument("--mwindows", action="store_true", help="Compile with -mwindows flag (no console)")
+    parser.add_argument("--release", action="store_true", help="Compiles for release")
 
     return parser
 
@@ -44,8 +45,11 @@ def main():
         print(f"{Colors.BLUE}Compiling...\n{Colors.RED}{source_dir}/{Colors.ENDC}{Colors.ENDC}")
         
         source_files = Helpers.get_source_files([".cpp", ".c"], source_dir)
+        
+        releaseStatus = "-DDISABLE_OPENGL_ERROR_CHECKING" if args.release else ""
+        
         object_files = Helpers.compile_source_files(source_files, build_dir, include_dir, 
-                                                    additional_flags = additional_compile_flags)
+                                                    additional_flags = additional_compile_flags + releaseStatus)
         
         print(f"{Colors.BLUE}\nLinking...\n{Colors.YELLOW}{libs}{Colors.ENDC}{Colors.ENDC}")
         
