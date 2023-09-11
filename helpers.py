@@ -40,6 +40,14 @@ class Helpers:
             object_files.append(object_file)
 
         return object_files
+    
+    @staticmethod
+    def compile_resource_file(file_name, build_dir):
+        resource_file = os.path.join(build_dir, file_name + ".o")
+        compile_command = f"windres {file_name}.rc {resource_file}"
+        print(f"{ANSIColors.GRAY}{compile_command}{ANSIColors.ENDC}")
+        subprocess.call(compile_command, shell=True)
+        return resource_file
 
     @staticmethod
     def link_object_files(object_files, build_dir, file_name, lib_dir, lib, additional_flags):

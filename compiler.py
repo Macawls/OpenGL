@@ -8,6 +8,8 @@ from helpers import (
 )
 
 file_name = "opengl"
+resource_file_name = "config"
+
 build_dir = "build"
 source_dir = "src"
 dependencies_dir = "dependencies"
@@ -21,10 +23,9 @@ libs = "-lglfw3 -lglew32 -lopengl32 -lgdi32"
 
 def setupParser():
     parser = argparse.ArgumentParser(description="Compile and optionally run the source")
-    parser.add_argument("--run", action="store_true", help="Run the executable after building")
-    parser.add_argument("--clean", action="store_true", help="Clean the build directory before building")
+    parser.add_argument("--run", action="store_true", help="Run the executable")
+    parser.add_argument("--clean", action="store_true", help="Clean the build directory")
     parser.add_argument("--build", action="store_true", help="Build the source")
-    parser.add_argument("--mwindows", action="store_true", help="Build with -mwindows flag (no console)")
     parser.add_argument("--release", action="store_true", help="Builds for release")
 
     return parser
@@ -46,17 +47,19 @@ def main():
         
         source_files = Helpers.get_source_files([".cpp", ".c"], source_dir)
         
-        releaseStatus = "-DDISABLE_OPENGL_ERROR_CHECKING" if args.release else ""
-        
+        disable_gl_error_checks_status = "-DDISABLE_OPENGL_ERROR_CHECKING" if args.release else ""
         object_files = Helpers.compile_source_files(source_files, build_dir, include_dir, 
-                                                    additional_flags = additional_compile_flags + releaseStatus)
+                                                    additional_flags = additional_compile_flags + disable_gl_error_checks_status)
+        
+        if args.release:
+           object_files.append(Helpers.compile_resource_file(resource_file_name, build_dir))
         
         print(f"{Colors.BLUE}\nLinking...\n{Colors.YELLOW}{libs}{Colors.ENDC}{Colors.ENDC}")
         
-        mwindowsStatus = " -mwindows" if args.mwindows else ""
         
+        no_shell_status = " -mwindows" if args.release else ""
         Helpers.link_object_files(object_files, build_dir, file_name, lib_dir, libs, 
-                                  additional_flags = additional_linker_flags + mwindowsStatus)
+                                  additional_flags = additional_linker_flags + no_shell_status)
         
         end_time = time.time()
 
