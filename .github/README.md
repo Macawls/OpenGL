@@ -48,15 +48,17 @@ Run after building
 python compiler.py --build --run
 ```
 
-Build for release (adds rc files, disables debug flags, etc)
+Build for release (adds rc files, release flags, etc)
 
 ```shell
 python compiler.py --build --release
 ```
 
-## Misc
+## Tools and Misc
 
-### Using a Custom Font for IMGUI
+You can find various tools under the tools directory. Most of them are for converting files into an appropriate header file format for embedding.
+
+### Custom Font for IMGUI
 
 [Relevant ImGUI Source](https://github.com/ocornut/imgui/blob/master/misc/fonts/binary_to_compressed_c.cpp)
 
@@ -70,4 +72,16 @@ Make sure the final file is encoded as UTF-8 👍
 ImGui::GetIO().Fonts->AddFontFromMemoryCompressedTTF(
         font_compressed_data, 
         font_compressed_size, fontSize);
+```
+
+### Converting Images
+
+From the glfw [documentation](https://www.glfw.org/docs/3.3/group__window.html#gadd7ccd39fe7a7d1f0904666ae5932dc5),
+
+The pixels are 32-bit, little-endian, non-premultiplied RGBA, i.e. eight bits per channel with the red channel first. They are arranged canonically as packed sequential rows, starting from the top-left corner"
+
+I figured since ```stbi_load``` works seamlessly you can use the following binary to write image data to a .h file.
+
+```bash
+.\image_to_header.exe name.png output.h
 ```
