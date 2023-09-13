@@ -2,18 +2,18 @@
 #include "utils/logger.h"
 #include "systems/window/window_context.h"
 
-// #include "demos/triangle/triangle.h"
 #include "demos/cube/cube.h"
+#include "resources/images/icon/icon.h"
 
-#define WIDTH 1600
-#define HEIGHT 900
-#define WINDOW_TITLE "Cube Demo"
+#define ICON_DATA { image_width, image_height, image_data }
+#define WINDOW_PARAMS { 1280, 720, "Cube Demo", 22.0f, ICON_DATA }
+
 
 int main(void)
 {
     Logger::SetPriority(Logger::LogPriority::Debug);
-    
-    WindowContext context = WindowContext(WIDTH, HEIGHT, WINDOW_TITLE);
+    WindowContext context = WindowContext(WINDOW_PARAMS);
+
     CubeDemo demo = CubeDemo(context);
 
     auto update = [&](float deltaTime)
@@ -22,9 +22,9 @@ int main(void)
         demo.uiUpdate();
     };
 
-    context.SetUpdate(update);
+    context.SetDeltaUpdate(update);
     context.BeginLoop();
-    
+
     Logger::Log("Exiting...");
     return 0;
 }
