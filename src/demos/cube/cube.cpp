@@ -19,6 +19,13 @@ CubeDemo::CubeDemo(WindowContext &context)
     window = context.GetGLFWWindow();
     camera = PerspectiveCamera(context);
 
+    RenderSettings
+        .PolygonMode({GL_FRONT_AND_BACK, GL_FILL})
+        .Depth({true, GL_LESS})
+        .Blending({true, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_FUNC_ADD})
+        .Culling({true, GL_BACK, GL_CCW})
+        .Apply();
+
     InitCube();
 
     gameUpdate = [&](float deltaTime)
@@ -51,73 +58,21 @@ CubeDemo::CubeDemo(WindowContext &context)
 
     uiUpdate = [&]()
     {
-        ImGui::SetNextWindowPos(ImVec2(ImGui::GetIO().DisplaySize.x - 370, 20));
-        ImGui::SetNextWindowSize(ImVec2(350, 0));
-        ImGui::Begin("Tooltips");
-        ImGui::Text("Play around with use lines");
-        ImGui::Text("combined with cull face modes");
-        ImGui::End();
+        ImGui::SetNextWindowPos(ImVec2(context.ImGUI.IO->DisplaySize.x - 490, 20));
+        ImGui::SetNextWindowSize(ImVec2(470, 0));
         
-        
-        ImGui::SetNextWindowPos(ImVec2(20, 20));
-        ImGui::SetNextWindowSize(ImVec2(500, 0), ImGuiCond_Always);
-        
-        ImGui::Begin("Cube Demo");
+        ImGui::Begin("Rendering");
         ImGui::Dummy(ImVec2(0.0f, 5.0f));
+        RenderSettings.ShowInfo();
+        ImGui::Separator();
+        ImGui::Text("Settings");
+        RenderSettings.ShowImGuiTabBar();
+        ImGui::End();
 
-        ImGui::Text("Renderer: %s", glGetString(GL_RENDERER));
-        ImGui::Spacing();
-        ImGui::Text("FPS: %.2f", ImGui::GetIO().Framerate);
-        ImGui::Spacing();
-        ImGui::Text("Frame Time: %.4f ms", ImGui::GetIO().DeltaTime * 1000.0f);
+        ImGui::SetNextWindowPos(ImVec2(20, 20));
+        ImGui::SetNextWindowSize(ImVec2(550, 0), ImGuiCond_Always);
 
-        if (ImGui::Checkbox("Use Lines", &context.renderConfig.useLines))
-        {
-            context.CycleRenderMode();
-        }
-            
-        if (ImGui::Checkbox("Enable Face Culling", &cullFaces))
-        {
-            if (cullFaces)
-            {
-                glEnable(GL_CULL_FACE);
-            }
-            else
-            {
-                glDisable(GL_CULL_FACE);
-            }
-        }
-
-        if (cullFaces)
-        {
-            const char *cullFaceModes[] = { "GL_BACK", "GL_FRONT", "GL_FRONT_AND_BACK" };
-            ImGui::Combo("Cull Face Mode", &cullFaceMode, cullFaceModes, IM_ARRAYSIZE(cullFaceModes));
-
-            switch (cullFaceMode)
-            {
-            case 0:
-                glCullFace(GL_BACK);
-                break;
-            case 1:
-                glCullFace(GL_FRONT);
-                break;
-            case 2:
-                glCullFace(GL_FRONT_AND_BACK);
-                break;
-            default:
-                break;
-            }
-        }
-
-        if (cullFaces)
-        {
-            const char *frontFaceModes[] = { "GL_CCW", "GL_CW" };
-            ImGui::Combo("Front Face Mode", &frontFaceMode, frontFaceModes, IM_ARRAYSIZE(frontFaceModes));
-            glFrontFace(frontFaceMode == 0 ? GL_CCW : GL_CW);
-        }
-
-        ImGui::Dummy(ImVec2(0.0f, 15.0f));
-
+        ImGui::Begin("Cube Demo");
         if (ImGui::BeginTabBar("Tabs"))
         {
             if (ImGui::BeginTabItem("Parameters"))
@@ -179,17 +134,14 @@ CubeDemo::CubeDemo(WindowContext &context)
                     ImGui::TextUnformatted(logEntry.c_str());
                 }
                 ImGui::EndChild();
-
                 ImGui::EndTabItem();
             }
-
+            
             ImGui::EndTabBar();
         }
 
         ImGui::End();
     };
-
-
 }
 
 void CubeDemo::InitCube()

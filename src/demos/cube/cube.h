@@ -9,6 +9,7 @@
 #include "../../systems/window/window_context.h"
 #include "../../systems/shader/shader.h"
 #include "../../systems/camera/perspective_camera.h"
+#include "../../systems/settings/render_settings.h"
 
 class CubeDemo
 {
@@ -67,15 +68,12 @@ private:
                         .Compile();
     // Cube Variables
     glm::vec4 cubeColor = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
-    
     glm::vec3 cubeTranslation = glm::vec3(0.0f, 0.0f, 0.0f);
     glm::vec3 cubeRotation = glm::vec3(25.0f, 45.0f, 0.0f);
     glm::vec3 cubeScale = glm::vec3(1.0f, 1.0f, 1.0f);
 
-    bool cullFaces = true;
-    int cullFaceMode = 0; // 0 = GL_BACK, 1 = GL_FRONT, 2 = GL_FRONT_AND_BACK
-    int frontFaceMode = 0; // 0 = GL_CCW, 1 = GL_CW
-
+    OpenGLRenderSettings RenderSettings = OpenGLRenderSettings();
+    
     void InitCube();
 
 public:
