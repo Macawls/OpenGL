@@ -1,8 +1,5 @@
 #include "imgui_module.h"
 
-#include "../../imgui/imgui_impl_glfw.h"
-#include "../../imgui/imgui_impl_opengl3.h"
-
 #include "../../utils/logger.h"
 #include "../../resources/fonts/jetbrainsmono.h"
 
@@ -12,9 +9,9 @@ bool ImGUIModule::Init(const char *glsl_version, GLFWwindow *window, float fontS
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init(glsl_version);
 
-    auto &io = ImGui::GetIO();
+    IO = &ImGui::GetIO();
     
-    ImGui::GetIO().Fonts->AddFontFromMemoryCompressedTTF(
+    IO->Fonts->AddFontFromMemoryCompressedTTF(
         jetbrainsmono_compressed_data, 
         jetbrainsmono_compressed_size, fontSize);
 
