@@ -11,41 +11,62 @@
 #include "../../systems/camera/perspective_camera.h"
 #include "../../systems/settings/render_settings.h"
 
+// https://github.com/c2d7fa/opengl-cube/blob/master/main.c
+
 class CubeDemo
 {
 private:
-
-    // Cube
     float vertices[24] = {
-       -0.5f, -0.5f, -0.5f,
-        0.5f, -0.5f, -0.5f,
-        0.5f, 0.5f, -0.5f,
-       -0.5f, 0.5f, -0.5f,
-       -0.5f, -0.5f, 0.5f,
-        0.5f, -0.5f, 0.5f,
-        0.5f, 0.5f, 0.5f,
-       -0.5f, 0.5f, 0.5f,
+        // Front face
+        0.5,  0.5,  0.5,
+       -0.5,  0.5,  0.5,
+       -0.5, -0.5,  0.5,
+        0.5, -0.5,  0.5,
+
+        // Back face
+        0.5,  0.5, -0.5,
+       -0.5,  0.5, -0.5,
+       -0.5, -0.5, -0.5,
+        0.5, -0.5, -0.5,
     };
     
     
     unsigned int indices[36] = {
-        0, 1, 2, 2, 3, 0, // Front
-        4, 5, 6, 6, 7, 4, // Back
-        1, 5, 6, 6, 2, 1, // Right
-        0, 4, 7, 7, 3, 0, // Left
-        3, 2, 6, 6, 7, 3, // Top
-        0, 1, 5, 5, 4, 0  // Bottom
+        // Front
+        0, 1, 2,
+        2, 3, 0,
+
+        // Right
+        0, 3, 7,
+        7, 4, 0,
+
+        // Bottom
+        2, 6, 7,
+        7, 3, 2,
+
+        // Left
+        1, 5, 6,
+        6, 2, 1,
+
+        // Back
+        4, 7, 6,
+        6, 5, 4,
+
+        // Top
+        5, 1, 0,
+        0, 4, 5,
     };
 
     float colors[24] = {
-        1.0f, 0.0f, 0.0f, // Red
-        0.0f, 1.0f, 0.0f, // Green
-        0.0f, 0.0f, 1.0f, // Blue
-        1.0f, 1.0f, 0.0f, // Yellow
-        0.0f, 1.0f, 0.0f, // Green
-        0.0f, 1.0f, 1.0f, // Cyan
-        1.0f, 1.0f, 1.0f, // White
-        0.5f, 0.5f, 0.5f  // Gray
+        1.0, 0.4, 0.6,
+        1.0, 0.9, 0.2,
+        0.7, 0.3, 0.8,
+        0.5, 0.3, 1.0,
+
+        0.2, 0.6, 1.0,
+        0.6, 1.0, 0.4,
+        0.6, 0.8, 0.8,
+        0.4, 0.8, 0.8,
     };
 
 
