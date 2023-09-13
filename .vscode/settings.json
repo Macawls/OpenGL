@@ -70,7 +70,8 @@
         "ranges": "cpp",
         "span": "cpp",
         "stack": "cpp",
-        "*.vert": "cpp"
+        "*.vert": "cpp",
+        "*.frag": "cpp"
     },
     "cmake.configureOnOpen": false
 }
