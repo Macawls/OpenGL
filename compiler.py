@@ -47,9 +47,9 @@ def main():
         
         source_files = Helpers.get_source_files([".cpp", ".c"], source_dir)
         
-        disable_gl_error_checks_status = "-DDISABLE_OPENGL_ERROR_CHECKING" if args.release else ""
+        release_status = "-DRELEASE" if args.release else ""
         object_files = Helpers.compile_source_files(source_files, build_dir, include_dir, 
-                                                    additional_flags = additional_compile_flags + disable_gl_error_checks_status)
+                                                    additional_flags = additional_compile_flags + release_status)
         
         if args.release:
            object_files.append(Helpers.compile_resource_file(resource_file_name, build_dir))

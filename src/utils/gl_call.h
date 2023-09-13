@@ -8,7 +8,7 @@
 // DISABLE_OPENGL_ERROR_CHECKING is specified for release builds
 // Example to trigger an error GLCall(glEnable(GL_INVALID_ENUM));
 
-#ifdef DISABLE_OPENGL_ERROR_CHECKING
+#ifdef RELEASE
     #define GLCall(x) x
 #else
     // Macro that polls for OpenGL errors, 
@@ -44,6 +44,6 @@ static void CheckGLError(const char* function, const char* file, int line) {
         Logger::LogError("[OpenGL Error] %s: %s, %s:%d", function, errorString, file, line);
         
         // Force exit if there is an error
-        exit(1);
+        // exit(1);
     }
 }
