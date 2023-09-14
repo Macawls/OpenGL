@@ -62,7 +62,6 @@ CubeDemo::CubeDemo(WindowContext &context)
         ImGui::SetNextWindowSize(ImVec2(470, 0));
         
         ImGui::Begin("Rendering");
-        ImGui::Dummy(ImVec2(0.0f, 5.0f));
         RenderSettings.ShowInfo();
         ImGui::Separator();
         ImGui::Text("Settings");

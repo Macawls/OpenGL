@@ -20,7 +20,7 @@ public:
     OpenGLRenderSettings& Apply();
 
     void ShowImGuiTabBar();
-    void ShowInfo(double updateRate = 0.1);
+    void ShowInfo(double updateRate = 0.08);
 private:
     ImGuiIO* m_io;
     RenderConfig m_config;
