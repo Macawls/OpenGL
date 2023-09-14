@@ -12,7 +12,8 @@
 struct WindowStatus
 {
     bool isFullscreen = false;
-    bool isSleeping = false;
+    bool isMinimized = false;
+    bool isVSync = false;
 };
 
 struct WindowParams
@@ -38,6 +39,9 @@ public:
     ~WindowContext();
     ImGUIModule ImGUI = ImGUIModule();
     
+    // Read only
+    WindowStatus WindowStatus;
+    
     // Sets the update function, called every frame
     void SetDeltaUpdate(std::function<void(float deltaTime)> func) { this->m_update = func; }
     
@@ -46,11 +50,14 @@ public:
     // Begins the main loop, update function is called every frame
     void BeginLoop();
 
+    // Toggle's VSync, static because there's only one window really
+    static void ToggleVSync(bool enable) { glfwSwapInterval(enable ? 1 : 0); }
+
     // Returns the GLFWwindow pointer
     GLFWwindow *GetGLFWWindow() const { return m_window; }
     
     // Returns the video mode of the primary monitor
-    GLFWvidmode GetVideoMode() { return *glfwGetVideoMode(glfwGetPrimaryMonitor()); }
+    static GLFWvidmode GetVideoMode() { return *glfwGetVideoMode(glfwGetPrimaryMonitor()); }
     
     // Returns the framebuffer size
     FramebufferSize* GetFrameBufferSize() { return &m_FramebufferSize; }
@@ -62,8 +69,7 @@ private:
     GLFWwindow *m_window;
     std::function<void(float deltaTime)> m_update;
     FramebufferSize m_FramebufferSize = { 0, 0 };
-    WindowStatus m_windowStatus;
-
+    
     bool Init(WindowParams params);
     void SetStandardCallbacks();
     void SetStandardWindowHints();

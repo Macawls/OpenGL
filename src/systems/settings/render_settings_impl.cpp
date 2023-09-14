@@ -3,6 +3,7 @@
 
 #include "render_settings.h"
 #include "../../utils/gl_call.h"
+#include "../window/window_context.h"
 #include <GLFW/glfw3.h>
 
 OpenGLRenderSettings::OpenGLRenderSettings(const RenderConfig &settings)
@@ -345,6 +346,7 @@ void OpenGLRenderSettings::ShowInfo(double updateRate)
     double currentTime = glfwGetTime();
     static float lastFrameTime = 0.0f;
     static float lastFPS = 0.0f;
+    static bool isVSync = false;
 
     if (currentTime - lastUpdateTime >= updateRate)
     {
@@ -353,12 +355,15 @@ void OpenGLRenderSettings::ShowInfo(double updateRate)
         lastUpdateTime = currentTime;
     }
 
-
-    ImGui::Text("Renderer: %s", glGetString(GL_RENDERER));
     ImGui::Spacing();
-    ImGui::Text("FPS: %.2f", lastFPS);
+    if (ImGui::Checkbox("VSync", &isVSync)){ WindowContext::ToggleVSync(isVSync); }
+    ImGui::SameLine();
+    ImGui::Text("       FPS: %.2f", lastFPS);
     ImGui::Spacing();
-    ImGui::Text("Frame Time: %.4fms", lastFrameTime);
+    ImGui::Text("Frame Time:     %.4fms", lastFrameTime);
     ImGui::Spacing();
-    ImGui::Text("Window: %.0fpx x %.0fpx ", m_io->DisplaySize.x, m_io->DisplaySize.y);
+    ImGui::Text("Window Size:    %.0fpx X %.0fpx ", m_io->DisplaySize.x, m_io->DisplaySize.y);
+    ImGui::Spacing();
+    ImGui::Text("Renderer:       %s", glGetString(GL_RENDERER));
+    ImGui::Spacing();
 }

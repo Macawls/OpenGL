@@ -39,7 +39,7 @@ void WindowContext::BeginLoop()
         glfwPollEvents();
 
         // Prevents crash when framebuffer is 0
-        if (m_windowStatus.isSleeping)
+        if (WindowStatus.isMinimized)
         {
             glfwWaitEvents();
             continue;
@@ -118,7 +118,7 @@ void WindowContext::SetStandardCallbacks()
     glfwSetWindowIconifyCallback(m_window, [](GLFWwindow *window, int iconified)
     {
         WindowContext *win = (WindowContext *)glfwGetWindowUserPointer(window);
-        win->m_windowStatus.isSleeping = iconified;
+        win->WindowStatus.isMinimized = iconified;
     });
 
     glfwSetWindowCloseCallback(m_window, [](GLFWwindow *window)
@@ -148,6 +148,9 @@ void WindowContext::SetStandardWindowHints()
 
     // Set the GLFW context creation to be more robust
     glfwWindowHint(GLFW_CONTEXT_RELEASE_BEHAVIOR, GLFW_RELEASE_BEHAVIOR_FLUSH);
+
+    // Disable double buffering
+    // glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_FALSE);
 }
 
 void WindowContext::Close()
